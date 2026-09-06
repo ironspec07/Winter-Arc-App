@@ -13,3 +13,7 @@ Commit and push; the main Vercel project will redeploy.
 
 ## PWA
 The Winter Arc app is configured for the `/winterarc/` base path, including the manifest start URL/scope and service worker scope.
+
+
+## Android / Chrome installability
+The app now includes required 192x192 and 512x512 PNG icons and is scoped to /winterarc/. After deploying, open https://ironspec.online/winterarc/ in Chrome. Use Chrome's **Install app** option when offered. **Create shortcut** creates a bookmark/shortcut and is not the same as a PWA installation. If Chrome still shows only Create shortcut after a new deployment, clear site data for ironspec.online, reload the page, and check that /winterarc/manifest.webmanifest, /winterarc/sw.js, and both icon files return HTTP 200.
