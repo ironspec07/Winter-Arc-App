@@ -58,7 +58,7 @@ export const Header: React.FC<HeaderProps> = ({
             <div className="min-w-0">
               <div className="flex items-center gap-1.5">
                 <h1 className="text-xs sm:text-sm font-bold tracking-tight text-zinc-900 dark:text-zinc-100 font-mono uppercase truncate">
-                  Winter Habitat
+                  Hibern8
                 </h1>
                 <span className="hidden sm:inline-block text-[10px] px-1.5 py-0.5 rounded font-mono font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700">
                   2026
