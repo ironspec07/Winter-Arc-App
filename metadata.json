@@ -1,0 +1,6 @@
+{
+  "name": "Winter Habitat",
+  "description": "Minimal, high-performance executive habit habitat and discipline tracker for the 2026 Winter Arc.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
