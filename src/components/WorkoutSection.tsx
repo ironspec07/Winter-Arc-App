@@ -193,17 +193,26 @@ export const WorkoutSection: React.FC<WorkoutSectionProps> = ({
         </div>
 
         {/* Routine Progress line */}
-        <div className="mt-4 pt-3 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between gap-3 text-xs font-mono">
-          <span className="text-zinc-600 dark:text-zinc-400 font-medium">
-            Progress: {completedExercises} / {exercises.length} sets completed
-          </span>
-          <div className="w-32 sm:w-48 h-2 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-zinc-900 dark:bg-zinc-100 rounded-full transition-all duration-300"
-              style={{ width: `${routineProgressPct}%` }}
-            />
+        {exercises.length > 0 ? (
+          <div className="mt-4 pt-3 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between gap-3 text-xs font-mono">
+            <span className="text-zinc-600 dark:text-zinc-400 font-medium">
+              Progress: {completedExercises} / {exercises.length} sets completed
+            </span>
+            <div className="w-32 sm:w-48 h-2 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-zinc-900 dark:bg-zinc-100 rounded-full transition-all duration-300"
+                style={{ width: `${routineProgressPct}%` }}
+              />
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="mt-4 pt-3 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between text-xs font-mono text-emerald-600 dark:text-emerald-400 font-medium">
+            <span>Rest Protocol Active · Zero Workout Required</span>
+            <span className="px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800">
+              Auto-Cleared
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Main Grid: Exercises & Floating Rest Timer */}
@@ -212,15 +221,30 @@ export const WorkoutSection: React.FC<WorkoutSectionProps> = ({
         <div className="lg:col-span-2 space-y-3">
           <div className="flex items-center justify-between px-1">
             <h3 className="text-xs font-bold uppercase tracking-wider font-mono text-zinc-500 dark:text-zinc-400">
-              Prescribed Movements
+              {exercises.length > 0 ? 'Prescribed Movements' : 'Rest Protocol'}
             </h3>
-            <span className="text-[11px] font-mono text-zinc-400">
-              Tap card to complete
-            </span>
+            {exercises.length > 0 && (
+              <span className="text-[11px] font-mono text-zinc-400">
+                Tap card to complete
+              </span>
+            )}
           </div>
 
           <div className="space-y-2.5">
-            {exercises.map((ex, idx) => {
+            {exercises.length === 0 ? (
+              <div className="p-6 rounded-2xl border border-emerald-200/80 dark:border-emerald-800/80 bg-emerald-50/40 dark:bg-emerald-950/20 text-center space-y-2">
+                <div className="w-10 h-10 mx-auto rounded-xl bg-emerald-100 dark:bg-emerald-900/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                  <CheckCircle2 className="w-5 h-5 stroke-[2.5]" />
+                </div>
+                <h4 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 font-mono">
+                  Complete Rest & Recovery Day
+                </h4>
+                <p className="text-xs text-zinc-600 dark:text-zinc-400 max-w-md mx-auto leading-relaxed">
+                  No lifting, conditioning, or step requirements prescribed for today. Allow muscles, central nervous system, and joints to fully adapt and recover.
+                </p>
+              </div>
+            ) : (
+              exercises.map((ex, idx) => {
               const isChecked = dayRecord.ex?.[idx] === true;
               const isExpanded = expandedIndex === idx;
 
@@ -284,7 +308,8 @@ export const WorkoutSection: React.FC<WorkoutSectionProps> = ({
                   )}
                 </div>
               );
-            })}
+            })
+          )}
           </div>
 
           <div className="p-3.5 rounded-xl bg-zinc-100/70 dark:bg-zinc-800/40 border border-zinc-200/60 dark:border-zinc-800/60 text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">

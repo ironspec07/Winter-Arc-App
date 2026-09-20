@@ -63,7 +63,7 @@ export interface WorkoutRoutine {
   id: string;
   title: string;
   subtitle: string;
-  type: 'push' | 'pull' | 'legs' | 'recovery' | 'gym';
+  type: 'push' | 'pull' | 'legs' | 'recovery' | 'gym' | 'strength' | 'aerobic' | 'conditioning' | 'sport' | 'rest';
   exercises: Exercise[];
   focusNotes: string;
 }

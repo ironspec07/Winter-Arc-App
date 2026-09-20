@@ -119,98 +119,101 @@ export const HABIT_DEFINITIONS: HabitDefinition[] = [
 ];
 
 export const WORKOUT_ROUTINES: Record<string, WorkoutRoutine> = {
-  'Push A': {
-    id: 'push-a',
-    title: 'Push A // Chest, Shoulders, Triceps',
-    subtitle: 'Foundation Home Hypertrophy',
-    type: 'push',
+  'Strength A': {
+    id: 'strength-a',
+    title: 'Strength A // Upper Body',
+    subtitle: 'Chest, Back, Delts & Biceps',
+    type: 'strength',
     exercises: [
-      { name: 'Standard Push-ups', setsReps: '3 × 8–15 reps', target: 'Chest / Triceps', cues: 'Full lock at top, slow 2-sec eccentric.' },
-      { name: 'Pike Push-ups', setsReps: '3 × 6–12 reps', target: 'Anterior Deltoids / Upper Chest', cues: 'Elevate hips, head moves forward of hands.' },
-      { name: 'Diamond Push-ups', setsReps: '2 × 6–12 reps', target: 'Triceps Lateral Head', cues: 'Hands under sternum, elbows tucked at 45°.' },
-      { name: 'Chair Dips', setsReps: '2 × 8–15 reps', target: 'Triceps / Lower Chest', cues: 'Keep torso upright, 90° elbow bend.' },
+      { name: 'Push-ups', setsReps: '3 × 8–15', target: 'Chest / Triceps / Core', cues: 'Full lock at top, slow controlled eccentric descent.' },
+      { name: 'Dumbbell Rows', setsReps: '3 × 12–20 / side', target: 'Lats / Rhomboids', cues: 'Hinge at hips, pull dumbbell towards hip pocket.' },
+      { name: 'Pike Push-ups', setsReps: '3 × 6–12', target: 'Anterior Deltoids / Shoulders', cues: 'Elevate hips, head tracks slightly forward of hands.' },
+      { name: 'Dumbbell Reverse Fly', setsReps: '3 × 12–20', target: 'Rear Delts / Scapular Stabilizers', cues: 'Squeeze upper back at top, controlled lower.' },
+      { name: 'Dumbbell Biceps Curl', setsReps: '2 × 12–20', target: 'Biceps Brachii', cues: 'Strict form, no swinging, full elbow extension.' },
+      { name: 'Plank', setsReps: '3 × 30–60 sec', target: 'Transverse Abdominis / Core', cues: 'Brace core, squeeze glutes, steady breathing.' },
     ],
-    focusNotes: 'Leave 1–2 reps in reserve on early sets. Focus on chest tension and full range of motion.',
+    focusNotes: 'Rest: 60–90 sec between sets. Prioritize strict range of motion and form over tempo.',
   },
-  'Pull A': {
-    id: 'pull-a',
-    title: 'Pull A // Back, Rear Delts, Biceps',
-    subtitle: 'Foundation Home Pulling Strength',
-    type: 'pull',
+  'Aerobic Conditioning': {
+    id: 'aerobic-conditioning',
+    title: 'Aerobic Conditioning // Zone 2 Foundation',
+    subtitle: 'Cardiovascular Base & Aerobic Capacity',
+    type: 'aerobic',
     exercises: [
-      { name: 'Weighted Backpack Rows', setsReps: '3 × 10–15 reps', target: 'Lats / Mid Traps', cues: 'Hinge at 45°, drive elbows back towards hips.' },
-      { name: 'Backpack Bicep Curls', setsReps: '3 × 10–15 reps', target: 'Biceps Brachii', cues: 'Supinate at top, strict posture without swing.' },
-      { name: 'Reverse Snow Angels', setsReps: '3 × 10–15 reps', target: 'Rear Delts / Scapular Stabilizers', cues: 'Prone on floor, hover arms throughout.' },
-      { name: 'Bent-over Rear Delt Fly', setsReps: '2 × 12–15 reps', target: 'Posterior Deltoids', cues: 'Light weight or books, squeeze upper back.' },
+      { name: 'Warm-up: March in place (60s), Arm circles (30s), Hip rotations (30s), Step-ups (2m), Easy movement (1m)', setsReps: '1 round', target: 'Full Body Dynamic Mobilization', cues: 'Smooth rhythmic motion, gradual heart rate elevation.' },
+      { name: 'Step-ups', setsReps: '4 rounds × 60 sec', target: 'Aerobic Engine / Quads & Glutes', cues: 'Consistent cadence, push through full foot.' },
+      { name: 'Marching High Knees', setsReps: '4 rounds × 60 sec', target: 'Cardio Endurance / Hip Flexors', cues: 'Drive knees to hip height, pump arms rhythmically.' },
+      { name: 'Bodyweight Squats', setsReps: '4 rounds × 15 reps', target: 'Lower Body Endurance', cues: 'Continuous steady pace, full depth without stopping.' },
+      { name: 'Low-impact Mountain Climbers', setsReps: '4 rounds × 45 sec', target: 'Aerobic Core & Conditioning', cues: 'Controlled foot taps, steady breathing cadence.' },
+      { name: 'Active Recovery / Easy Walking', setsReps: '4 rounds × 60 sec', target: 'Inter-round Recovery', cues: 'Deep nasal inhalations, lower heart rate.' },
+      { name: 'Cooldown: Easy Walking', setsReps: '5–10 min', target: 'Parasympathetic Transition', cues: 'Slow, relaxed breathing, gentle arm movement.' },
     ],
-    focusNotes: 'Prioritize scapular retraction before elbow pull. Maintain neutral spine during hinges.',
+    focusNotes: 'Main workout: 4 rounds with 60 sec easy walking between rounds. Intensity: ~5–6/10 (Zone 2/conversational).',
   },
-  'Legs A': {
-    id: 'legs-a',
-    title: 'Legs A // Quads, Hamstrings, Core',
-    subtitle: 'Lower Body Strength & Density',
-    type: 'legs',
+  'Strength B': {
+    id: 'strength-b',
+    title: 'Strength B // Lower Body',
+    subtitle: 'Quads, Hamstrings, Glutes & Core',
+    type: 'strength',
     exercises: [
-      { name: 'Tempo Bodyweight Squats', setsReps: '3 × 12–20 reps', target: 'Quadriceps / Glutes', cues: '3-second descent, drive knees over toes.' },
-      { name: 'Alternating Reverse Lunges', setsReps: '3 × 8–12 / leg', target: 'Quads / Glute Medius', cues: '90° angles at bottom, drive through front heel.' },
-      { name: 'Backpack Romanian Deadlift', setsReps: '3 × 10–15 reps', target: 'Hamstrings / Erector Spinae', cues: 'Push hips backward until deep hamstring stretch.' },
-      { name: 'Single-Leg Calf Raises', setsReps: '3 × 15–25 reps', target: 'Gastrocnemius / Soleus', cues: 'Full stretch on stair ledge, 1s peak hold.' },
-      { name: 'Standard Core Plank', setsReps: '3 × 30–60 sec', target: 'Transverse Abdominis', cues: 'Squeeze glutes, push floor away through forearms.' },
+      { name: 'Bodyweight Squats', setsReps: '3 × 15–25', target: 'Quadriceps / Glutes', cues: 'Hit parallel or below, drive up with authority.' },
+      { name: 'Reverse Lunges', setsReps: '3 × 8–12 / leg', target: 'Quads / Glute Medius', cues: '90° knee angles, push through front mid-foot.' },
+      { name: 'DB Romanian Deadlift', setsReps: '3 × 12–20', target: 'Hamstrings / Glutes / Lower Back', cues: 'Hip hinge, soft knees, deep stretch in hamstrings.' },
+      { name: 'Glute Bridges', setsReps: '3 × 15–25', target: 'Glutes / Posterior Chain', cues: 'Drive through heels, squeeze glutes at lockout.' },
+      { name: 'Standing Calf Raises', setsReps: '3 × 15–25', target: 'Gastrocnemius / Soleus', cues: 'Pause 1 sec at peak contraction, controlled lowering.' },
+      { name: 'Bird Dog', setsReps: '3 × 8–12 / side', target: 'Core Stability / Posterior Chain', cues: 'Opposite arm and leg reach, keep spine neutral.' },
     ],
-    focusNotes: 'Control the descent on every single rep. Legs respond exceptionally well to high tension.',
+    focusNotes: 'Rest: 60–90 sec between sets. Lower body builds the athletic engine.',
   },
-  'Push B': {
-    id: 'push-b',
-    title: 'Push B // Upper Chest & Shoulders',
-    subtitle: 'Overhead & Incline Focus',
-    type: 'push',
+  'Athletic Conditioning': {
+    id: 'athletic-conditioning',
+    title: 'Athletic Conditioning // Explosive Power & Agility',
+    subtitle: 'Dynamic Speed, Agility & Core Power',
+    type: 'conditioning',
     exercises: [
-      { name: 'Decline Push-ups (Feet on Bed/Chair)', setsReps: '3 × 6–12 reps', target: 'Clavicular Upper Chest', cues: 'Core braced tight, descend controlled.' },
-      { name: 'Pike Push-ups', setsReps: '3 × 6–12 reps', target: 'Shoulders / Overhead', cues: 'Keep eyes on toes, push straight back.' },
-      { name: 'Wide-Stance Push-ups', setsReps: '2 × 10–15 reps', target: 'Sternal Pectorals', cues: 'Wider than shoulders, flare elbows slightly.' },
-      { name: 'Chair Dips', setsReps: '2 × 8–15 reps', target: 'Triceps', cues: 'Controlled descent, explode upward.' },
+      { name: 'Dynamic Warm-up (Ankles, Hips, Torso, Light Jogging)', setsReps: '5–7 min', target: 'Dynamic Preparation', cues: 'Gradual ramp up, prime joints and tendons.' },
+      { name: 'Jump Rope or Line Hops', setsReps: '3–4 × 45–60 sec', target: 'Elasticity / Ankle Stiffness / Footwork', cues: 'Light and bouncy on balls of feet.' },
+      { name: 'Shadow Bowling / Fielding Drills', setsReps: '3–4 rounds × 60 sec', target: 'Rotational Power & Movement Dynamics', cues: 'Crisp explosive execution, mimic match rhythm.' },
+      { name: 'Lateral Shuffles / Shuttle Runs', setsReps: '4 × 20–30 sec', target: 'Deceleration & Lateral Quickness', cues: 'Low center of gravity, fast direction changes.' },
+      { name: 'Explosive Bodyweight Squat Jumps', setsReps: '3 × 6–10', target: 'Lower Body Rate of Force Development', cues: 'Land softly, immediately coil for next rep.' },
+      { name: 'Rotational Core Protocol (Russian Twists / Planks)', setsReps: '3 × 12–15 / side', target: 'Obliques / Anti-Rotation Strength', cues: 'Controlled torso twist, brace abs tightly.' },
     ],
-    focusNotes: 'Higher angle for push-ups activates clavicular fibers. Keep scapula moving naturally.',
+    focusNotes: 'Rest: 60–90 sec between sets. Move with fast athletic intent, snappy feet, and crisp form.',
   },
-  'Pull B': {
-    id: 'pull-b',
-    title: 'Pull B // Unilateral Lats & Upper Back',
-    subtitle: 'Balanced Upper Body Symmetry',
-    type: 'pull',
+  'Strength C': {
+    id: 'strength-c',
+    title: 'Strength C // Full Body Power & Balance',
+    subtitle: 'Compound Synergy & Total Conditioning',
+    type: 'strength',
     exercises: [
-      { name: 'Two-Arm Backpack Rows', setsReps: '3 × 10–15 reps', target: 'Rhomboids / Lats', cues: 'Pause 1 second at peak contraction.' },
-      { name: 'One-Arm Supported Backpack Row', setsReps: '3 × 8–12 / side', target: 'Isolated Latissimus Dorsi', cues: 'One hand on desk, pull dumbbell/pack to pocket.' },
-      { name: 'Backpack Hammer Curls', setsReps: '3 × 10–15 reps', target: 'Brachialis / Forearms', cues: 'Neutral grip with backpack straps, steady control.' },
-      { name: 'Prone Y-T-W Raises', setsReps: '2 × 10–15 reps', target: 'Lower Traps / Rear Delts', cues: 'Thumbs pointing to ceiling, slow pulses.' },
+      { name: 'Push-ups / Diamond Push-ups', setsReps: '3 × 8–12', target: 'Upper Body Press / Triceps', cues: 'Chest to deck, crisp lockout at top.' },
+      { name: 'Single-Arm DB Rows', setsReps: '3 × 10–15 / side', target: 'Lats / Mid Back', cues: 'Full stretch at bottom, elbow tucked to ribcage.' },
+      { name: 'Goblet Squats / Split Squats', setsReps: '3 × 10–15', target: 'Quads / Core Stability', cues: 'Torso upright, drive knees outward over toes.' },
+      { name: 'Single-Leg RDL / Hip Thrusts', setsReps: '3 × 10–12 / side', target: 'Hamstrings / Glute Hypertrophy', cues: 'Hinge smoothly, stabilize through ankle and hip.' },
+      { name: 'Overhead DB Press / Pike Press', setsReps: '3 × 8–12', target: 'Deltoids / Traps', cues: 'Press overhead smoothly without hyperextending back.' },
+      { name: 'Hanging Knee Raises / Dead Bug', setsReps: '3 × 10–15', target: 'Anterior Core Compression', cues: 'Prevent pelvis tilt, drive with lower abs.' },
     ],
-    focusNotes: 'Unilateral movements fix side imbalances. Focus intensely on muscle contraction.',
+    focusNotes: 'Rest: 60–90 sec between sets. Full-body stimulation priming athletic capability for weekend play.',
   },
-  'Legs B': {
-    id: 'legs-b',
-    title: 'Legs B // Posterior Chain & Glutes',
-    subtitle: 'Hip Dominance & Core Stability',
-    type: 'legs',
+  'Cricket': {
+    id: 'cricket',
+    title: 'Cricket // Match Day & Athletic Play',
+    subtitle: 'Bowling, Batting, Fielding & Game Conditioning',
+    type: 'sport',
     exercises: [
-      { name: 'Bulgarian Split Squats (Foot Elevated)', setsReps: '3 × 8–12 / leg', target: 'Quads / Glutes', cues: 'Slight forward lean, drop back knee down.' },
-      { name: 'Elevated Glute Bridges', setsReps: '3 × 12–20 reps', target: 'Glutes / Hamstrings', cues: 'Drive heels into floor or sofa, lock out hips.' },
-      { name: 'Backpack Good Mornings', setsReps: '3 × 10–15 reps', target: 'Hamstrings / Lower Back', cues: 'Pack hugged to chest, hip hinge with soft knees.' },
-      { name: 'Double-Leg Calf Raises', setsReps: '3 × 20–25 reps', target: 'Calves', cues: 'Explosive up, 3-second descent.' },
-      { name: 'Dead Bug Holds / Reps', setsReps: '3 × 8–12 / side', target: 'Anterior Core / Pelvic Stability', cues: 'Lower back pinned firmly to the floor throughout.' },
+      { name: 'Match Play / Training Session', setsReps: 'Full Session', target: 'Match Play / Batting, Bowling & Fielding', cues: 'Stay loose, compete hard, communicate well on field.' },
+      { name: 'Pre-Match Mobility & Dynamic Warm-up', setsReps: '10–15 min', target: 'Rotator Cuff, Hamstrings & Thoracic Spine', cues: 'Band work, arm swings, high knees, running buildup.' },
+      { name: 'Post-Match Cool Down & Hamstring/Hip Stretch', setsReps: '10 min', target: 'Joint Decompression & Lactic Clearance', cues: 'Static stretches held for 30–45 sec, rehydrate.' },
     ],
-    focusNotes: 'Split squats are brutally effective; breathe rhythmically and embrace the burn.',
+    focusNotes: 'Match intensity. Hydrate with electrolytes, stay mentally sharp between overs, enjoy the game.',
   },
-  'Active Recovery': {
-    id: 'recovery',
-    title: 'Active Recovery // Mobility & Reset',
-    subtitle: 'Restoration & Parasympathetic Recovery',
-    type: 'recovery',
-    exercises: [
-      { name: 'Brisk Outdoor Walk', setsReps: '30–45 mins', target: 'Aerobic Base / Zone 1', cues: 'Nasal breathing, natural arm swing, sunlight exposure.' },
-      { name: 'Hip Flexor & Hamstring Stretch', setsReps: '2 × 60 sec / side', target: 'Hip Mobility', cues: 'Deep calm diaphragmatic breathing, no bouncing.' },
-      { name: 'Thoracic Extension & Cat-Cow', setsReps: '2 × 15 reps', target: 'Spine Decompression', cues: 'Synchronize movement with full exhalations.' },
-      { name: 'Shoulder Dislocates / Broomstick', setsReps: '2 × 12 reps', target: 'Scapulohumeral Rhythm', cues: 'Gentle arc overhead, open chest.' },
-    ],
-    focusNotes: 'Recovery is an active discipline. Hydrate, stretch, and let nervous system rebuild.',
+  'Complete Rest': {
+    id: 'complete-rest',
+    title: 'Sunday // Complete Rest & Mental Reset',
+    subtitle: 'Zero Training · Full Physiological Restoration',
+    type: 'rest',
+    exercises: [],
+    focusNotes: 'Complete rest day. No workout, no step requirement. Sleep well, nourish your body, hydrate, and prepare mentally for the week ahead.',
   },
   'Gym Session': {
     id: 'gym-session',
@@ -271,27 +274,37 @@ export function getWorkoutRoutineForDate(iso: string): WorkoutRoutine {
     return WORKOUT_ROUTINES['Gym Session'];
   }
   
-  // Home PPL Day of Week mapping
+  // Weekly Training Schedule:
+  // Monday: Strength A (Upper Body)
+  // Tuesday: Aerobic Conditioning
+  // Wednesday: Strength B (Lower Body)
+  // Thursday: Athletic Conditioning
+  // Friday: Strength C (Full Body)
+  // Saturday: Cricket
+  // Sunday: Complete Rest
   const d = parseISODate(iso);
   const dayOfWeek = d.getDay(); // 0: Sun, 1: Mon, 2: Tue, 3: Wed, 4: Thu, 5: Fri, 6: Sat
   
   switch (dayOfWeek) {
-    case 1: return WORKOUT_ROUTINES['Push A'];
-    case 2: return WORKOUT_ROUTINES['Pull A'];
-    case 3: return WORKOUT_ROUTINES['Legs A'];
-    case 4: return WORKOUT_ROUTINES['Push B'];
-    case 5: return WORKOUT_ROUTINES['Pull B'];
-    case 6: return WORKOUT_ROUTINES['Legs B'];
+    case 1: return WORKOUT_ROUTINES['Strength A'];
+    case 2: return WORKOUT_ROUTINES['Aerobic Conditioning'];
+    case 3: return WORKOUT_ROUTINES['Strength B'];
+    case 4: return WORKOUT_ROUTINES['Athletic Conditioning'];
+    case 5: return WORKOUT_ROUTINES['Strength C'];
+    case 6: return WORKOUT_ROUTINES['Cricket'];
     case 0:
     default:
-      return WORKOUT_ROUTINES['Active Recovery'];
+      return WORKOUT_ROUTINES['Complete Rest'];
   }
 }
 
 export function getDayTargets(iso: string): Record<HabitKey, number> {
   const isHome = getPhase(iso) === 'home';
+  const d = parseISODate(iso);
+  const isSunday = d.getDay() === 0;
+
   return {
-    steps: isHome ? 7000 : 10000,
+    steps: isSunday ? 0 : (isHome ? 7000 : 10000),
     reading: isHome ? 20 : 40,
     study: isHome ? 3 : 4,
     water: 3,
@@ -299,16 +312,19 @@ export function getDayTargets(iso: string): Record<HabitKey, number> {
     jobs: 5,
     hygiene: 1,
     discipline: 1,
-    workout: 1,
+    workout: isSunday ? 0 : 1,
   };
 }
 
 export function isHabitComplete(key: HabitKey, day: DayRecord | undefined, iso: string): boolean {
   if (!day) return false;
   const targets = getDayTargets(iso);
+  const d = parseISODate(iso);
+  const isSunday = d.getDay() === 0;
 
   switch (key) {
     case 'steps':
+      if (isSunday) return true; // Sunday is complete rest with no step requirement
       return (day.steps || 0) >= targets.steps;
     case 'reading':
       return (day.reading || 0) >= targets.reading;
@@ -326,9 +342,10 @@ export function isHabitComplete(key: HabitKey, day: DayRecord | undefined, iso: 
     case 'discipline':
       return day.discipline === true;
     case 'workout':
+      if (isSunday) return true; // Sunday has no workout target
       if (getPhase(iso) === 'home') {
         const routine = getWorkoutRoutineForDate(iso);
-        if (routine.type === 'recovery') return true; // recovery day is automatically completed
+        if (routine.type === 'recovery' || routine.type === 'rest') return true;
         const ex = day.ex || {};
         return routine.exercises.length > 0 && routine.exercises.every((_, i) => ex[i] === true);
       }
