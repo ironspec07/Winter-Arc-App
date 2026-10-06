@@ -1,8 +1,9 @@
 import React from 'react';
 import { ActiveTab } from '../types';
-import { ChevronLeft, ChevronRight, Calendar, Sun, Moon, Download, Dumbbell, CheckCircle2, BarChart3, ListTodo } from 'lucide-react';
-import { formatDisplayDate, getPhase } from '../utils/arcEngine';
+import { ChevronLeft, ChevronRight, Calendar, Sun, Moon, Download, CheckCircle2, BarChart3, ListTodo } from 'lucide-react';
+import { formatDisplayDate } from '../utils/arcEngine';
 import { HabitatLogo } from './HabitatLogo';
+import { PWAInstallButton } from './PWAInstallButton';
 
 interface HeaderProps {
   selectedDate: string;
@@ -23,9 +24,7 @@ export const Header: React.FC<HeaderProps> = ({
   isDark,
   onToggleTheme,
   onExport,
-  completedCount,
 }) => {
-  const phase = getPhase(selectedDate);
   const { weekday, dateFormatted, relative } = formatDisplayDate(selectedDate);
 
   const handleStepDay = (delta: number) => {
@@ -42,7 +41,6 @@ export const Header: React.FC<HeaderProps> = ({
 
   const navItems: { id: ActiveTab; label: string; icon: React.ReactNode }[] = [
     { id: 'overview', label: 'Daily Habits', icon: <CheckCircle2 className="w-4 h-4" /> },
-    { id: 'workout', label: 'Training / PPL', icon: <Dumbbell className="w-4 h-4" /> },
     { id: 'telemetry', label: 'Telemetry & Arc', icon: <BarChart3 className="w-4 h-4" /> },
     { id: 'missions', label: 'Missions & System', icon: <ListTodo className="w-4 h-4" /> },
   ];
@@ -58,7 +56,7 @@ export const Header: React.FC<HeaderProps> = ({
             <div className="min-w-0">
               <div className="flex items-center gap-1.5">
                 <h1 className="text-xs sm:text-sm font-bold tracking-tight text-zinc-900 dark:text-zinc-100 font-mono uppercase truncate">
-                  Hibern8
+                  Habita
                 </h1>
                 <span className="hidden sm:inline-block text-[10px] px-1.5 py-0.5 rounded font-mono font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700">
                   2026
@@ -67,7 +65,7 @@ export const Header: React.FC<HeaderProps> = ({
               <div className="flex items-center gap-1.5 text-[10px] sm:text-[11px] font-medium text-zinc-500 dark:text-zinc-400 truncate">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
                 <span className="truncate">
-                  {phase === 'home' ? 'Phase 1: Foundation (Home PPL)' : 'Phase 2: Expansion (Gym)'}
+                  Winter Arc Protocol · Oct 6 – Dec 31
                 </span>
               </div>
             </div>
@@ -119,6 +117,8 @@ export const Header: React.FC<HeaderProps> = ({
                 <span>Today</span>
               </button>
             )}
+
+            <PWAInstallButton />
 
             <button
               type="button"

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { AppState, DayRecord, HabitKey, StreakStats } from '../types';
 import { StreakSummaryCard } from './StreakSummaryCard';
 import { WeeklyInsightsCard } from './WeeklyInsightsCard';
+import { PastSevenDaysSummaryCard } from './PastSevenDaysSummaryCard';
 import { triggerCompletionConfetti } from '../utils/confetti';
 import { 
   triggerHapticCompletion, 
@@ -14,15 +15,12 @@ import {
   getDayTargets, 
   isHabitComplete, 
   getCompletedHabitCount, 
-  getPhase,
-  getWorkoutRoutineForDate
+  TOTAL_HABITS
 } from '../utils/arcEngine';
 import { 
   Footprints, 
-  BookOpen, 
   BrainCircuit, 
   Droplet, 
-  Moon, 
   Briefcase, 
   Sparkles, 
   ShieldCheck, 
@@ -30,7 +28,6 @@ import {
   Check, 
   Plus, 
   Minus,
-  ArrowRight,
   Flame,
   Zap,
   CheckCircle2,
@@ -43,53 +40,45 @@ interface HabitsCardProps {
   dayRecord: DayRecord;
   state: AppState;
   onUpdateDay: (updater: (prev: DayRecord) => DayRecord) => void;
-  onNavigateToWorkout: () => void;
   onSelectDate: (date: string) => void;
   streakStats: StreakStats;
 }
 
 const HABIT_ICONS: Record<HabitKey, React.ReactNode> = {
   steps: <Footprints className="w-4 h-4 text-emerald-500" />,
-  reading: <BookOpen className="w-4 h-4 text-sky-500" />,
   study: <BrainCircuit className="w-4 h-4 text-indigo-500" />,
-  water: <Droplet className="w-4 h-4 text-cyan-500" />,
-  sleep: <Moon className="w-4 h-4 text-purple-500" />,
   jobs: <Briefcase className="w-4 h-4 text-amber-500" />,
-  hygiene: <Sparkles className="w-4 h-4 text-teal-500" />,
-  discipline: <ShieldCheck className="w-4 h-4 text-rose-500" />,
   workout: <Dumbbell className="w-4 h-4 text-orange-500" />,
+  discipline: <ShieldCheck className="w-4 h-4 text-rose-500" />,
+  water: <Droplet className="w-4 h-4 text-cyan-500" />,
+  hygiene: <Sparkles className="w-4 h-4 text-teal-500" />,
 };
 
 const QUICK_INCREMENTS: Record<HabitKey, number[]> = {
   steps: [1000, 2500],
-  reading: [5, 10],
   study: [0.5, 1],
-  water: [0.5, 1],
-  sleep: [7, 8],
   jobs: [1, 2],
-  hygiene: [],
-  discipline: [],
   workout: [],
+  discipline: [],
+  water: [0.5, 1],
+  hygiene: [],
 };
 
-type FilterCategory = 'All' | 'Physical' | 'Intellectual' | 'Discipline' | 'Recovery';
+type FilterCategory = 'All' | 'Physical' | 'Intellectual' | 'Discipline';
 
 export const HabitsCard: React.FC<HabitsCardProps> = ({
   selectedDate,
   dayRecord,
   state,
   onUpdateDay,
-  onNavigateToWorkout,
   onSelectDate,
   streakStats,
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<FilterCategory>('All');
 
-  const phase = getPhase(selectedDate);
   const targets = getDayTargets(selectedDate);
   const completedCount = getCompletedHabitCount(dayRecord, selectedDate);
-  const percentage = Math.round((completedCount / 9) * 100);
-  const routine = getWorkoutRoutineForDate(selectedDate);
+  const percentage = Math.round((completedCount / TOTAL_HABITS) * 100);
 
   // Immediate performance feedback loop status
   const getFeedbackDetails = (pct: number, count: number) => {
@@ -97,19 +86,19 @@ export const HabitsCard: React.FC<HabitsCardProps> = ({
       return {
         badge: 'Elite Execution',
         badgeColor: 'bg-emerald-500 text-white shadow-xs',
-        message: 'All 9 standards achieved with full compliance. Uncompromised discipline.',
+        message: 'All 7 standards achieved with full compliance. Uncompromised discipline.',
         icon: <Award className="w-3.5 h-3.5" />,
       };
     }
-    if (pct >= 78) { // 7/9 habits
+    if (count >= 6) { // 6/7 habits
       return {
         badge: 'Discipline Threshold Met',
         badgeColor: 'bg-emerald-100 text-emerald-900 dark:bg-emerald-950/70 dark:text-emerald-300 border border-emerald-300/80 dark:border-emerald-800',
-        message: `${9 - count} habit${9 - count === 1 ? '' : 's'} remaining to lock in an elite day.`,
+        message: `${TOTAL_HABITS - count} habit remaining to lock in an elite 7/7 day.`,
         icon: <Zap className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />,
       };
     }
-    if (pct >= 56) { // 5/9 habits
+    if (count >= 4) { // 4/7 habits
       return {
         badge: 'Baseline Standard Active',
         badgeColor: 'bg-amber-100 text-amber-900 dark:bg-amber-950/70 dark:text-amber-300 border border-amber-300/80 dark:border-amber-800',
@@ -121,14 +110,14 @@ export const HabitsCard: React.FC<HabitsCardProps> = ({
       return {
         badge: 'Protocol Initiated',
         badgeColor: 'bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700',
-        message: `${count} of 9 completed. Focus on clearing one objective at a time.`,
+        message: `${count} of ${TOTAL_HABITS} completed. Focus on clearing one objective at a time.`,
         icon: <CheckCircle2 className="w-3.5 h-3.5 text-zinc-500" />,
       };
     }
     return {
       badge: 'Uninitiated',
       badgeColor: 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800/80 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700',
-      message: 'Start today by checking off morning hydration, reading, or your step baseline.',
+      message: 'Start today by checking off morning hydration, study, or your step baseline.',
       icon: <CheckCircle2 className="w-3.5 h-3.5 text-zinc-400" />,
     };
   };
@@ -138,13 +127,12 @@ export const HabitsCard: React.FC<HabitsCardProps> = ({
   // Find next pending habit
   const nextPending = HABIT_DEFINITIONS.find(def => !isHabitComplete(def.key, dayRecord, selectedDate));
 
-  // Auto-trigger celebratory confetti and ripple when all 9 habits are completed
+  // Auto-trigger celebratory confetti and ripple when all 6 habits are completed
   const prevCountRef = useRef<number>(completedCount);
   const prevDateRef = useRef<string>(selectedDate);
 
   useEffect(() => {
-    // If the user was viewing the current date and just completed the 9th habit
-    if (prevDateRef.current === selectedDate && prevCountRef.current < 9 && completedCount === 9) {
+    if (prevDateRef.current === selectedDate && prevCountRef.current < TOTAL_HABITS && completedCount === TOTAL_HABITS) {
       triggerCompletionConfetti();
       triggerHapticGrandCelebration();
     }
@@ -187,18 +175,7 @@ export const HabitsCard: React.FC<HabitsCardProps> = ({
   };
 
   const handleQuickSetOrAdd = (key: HabitKey, amount: number) => {
-    if (key === 'sleep') {
-      const current = Number(dayRecord.sleep) || 0;
-      const target = targets.sleep || 7.5;
-      if (current < target && amount >= target) {
-        triggerHapticCompletion();
-      } else {
-        triggerHapticTap(12);
-      }
-      handleNumberChange(key, amount);
-    } else {
-      handleStep(key as keyof DayRecord, amount);
-    }
+    handleStep(key as keyof DayRecord, amount);
   };
 
   const handleToggle = (key: keyof DayRecord) => {
@@ -214,7 +191,7 @@ export const HabitsCard: React.FC<HabitsCardProps> = ({
     }));
   };
 
-  const categories: FilterCategory[] = ['All', 'Physical', 'Intellectual', 'Discipline', 'Recovery'];
+  const categories: FilterCategory[] = ['All', 'Physical', 'Intellectual', 'Discipline'];
 
   const filteredHabits = HABIT_DEFINITIONS.filter(def => {
     if (selectedCategory === 'All') return true;
@@ -255,7 +232,7 @@ export const HabitsCard: React.FC<HabitsCardProps> = ({
               </span>
               <span className="text-zinc-300 dark:text-zinc-700">·</span>
               <span className="text-[10px] sm:text-[11px] font-mono text-zinc-500 dark:text-zinc-400">
-                {phase === 'home' ? 'Home Phase' : 'Gym Phase'}
+                7 Core Habits Protocol
               </span>
             </div>
 
@@ -264,7 +241,7 @@ export const HabitsCard: React.FC<HabitsCardProps> = ({
                 {percentage}%
               </span>
               <span className="text-xs sm:text-sm font-semibold font-mono text-zinc-600 dark:text-zinc-400">
-                {completedCount} of 9 Completed
+                {completedCount} of {TOTAL_HABITS} Completed
               </span>
 
               {/* Dynamic Status Badge */}
@@ -302,18 +279,7 @@ export const HabitsCard: React.FC<HabitsCardProps> = ({
                 </div>
               </div>
 
-              {nextPending.key === 'workout' ? (
-                <motion.button
-                  whileTap={{ scale: 0.94 }}
-                  type="button"
-                  onClick={onNavigateToWorkout}
-                  className="px-2.5 py-1.5 rounded-lg bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-xs font-semibold hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors flex items-center gap-1 shrink-0 cursor-pointer"
-                  title="Open Workout Routine"
-                >
-                  <span>Train</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </motion.button>
-              ) : nextPending.type === 'check' ? (
+              {nextPending.type === 'check' ? (
                 <motion.button
                   whileTap={{ scale: 0.94 }}
                   type="button"
@@ -373,7 +339,7 @@ export const HabitsCard: React.FC<HabitsCardProps> = ({
                     <Sparkles className="w-3.5 h-3.5 text-amber-500 animate-pulse" />
                   </div>
                   <div className="text-[10px] text-emerald-700 dark:text-emerald-400 font-mono">
-                    All 9 standards achieved (100%)
+                    All 7 standards achieved (100%)
                   </div>
                 </div>
               </div>
@@ -396,9 +362,9 @@ export const HabitsCard: React.FC<HabitsCardProps> = ({
               className={`h-full rounded-full relative ${
                 percentage === 100
                   ? 'bg-emerald-500 shadow-sm shadow-emerald-500/50'
-                  : percentage >= 78
+                  : completedCount >= 6
                   ? 'bg-emerald-600 dark:bg-emerald-500'
-                  : percentage >= 56
+                  : completedCount >= 4
                   ? 'bg-zinc-800 dark:bg-zinc-200'
                   : 'bg-zinc-900 dark:bg-zinc-100'
               }`}
@@ -410,22 +376,22 @@ export const HabitsCard: React.FC<HabitsCardProps> = ({
 
             {/* Threshold Ticks */}
             <div className="absolute inset-0 pointer-events-none flex justify-between px-[1px]">
-              <span className="w-0.5 h-full bg-zinc-300/40 dark:bg-zinc-700/60" style={{ left: '55.5%' }} />
-              <span className="w-0.5 h-full bg-zinc-300/40 dark:bg-zinc-700/60" style={{ left: '77.7%' }} />
+              <span className="w-0.5 h-full bg-zinc-300/40 dark:bg-zinc-700/60" style={{ left: '57.1%' }} />
+              <span className="w-0.5 h-full bg-zinc-300/40 dark:bg-zinc-700/60" style={{ left: '85.7%' }} />
             </div>
           </div>
 
           {/* Performance Loop Legend */}
           <div className="flex justify-between items-center text-[9px] sm:text-[10px] font-mono text-zinc-400 dark:text-zinc-500 mt-1.5 px-0.5">
             <span>0% Start</span>
-            <span className={percentage >= 56 ? 'text-zinc-700 dark:text-zinc-300 font-semibold' : ''}>
-              56% Baseline (5)
+            <span className={completedCount >= 4 ? 'text-zinc-700 dark:text-zinc-300 font-semibold' : ''}>
+              57% Baseline (4)
             </span>
-            <span className={percentage >= 78 ? 'text-emerald-600 dark:text-emerald-400 font-semibold' : ''}>
-              78% Threshold (7)
+            <span className={completedCount >= 6 ? 'text-emerald-600 dark:text-emerald-400 font-semibold' : ''}>
+              86% Threshold (6)
             </span>
             <span className={percentage === 100 ? 'text-emerald-600 dark:text-emerald-400 font-bold' : ''}>
-              100% Elite (9)
+              100% Elite (7)
             </span>
           </div>
         </div>
@@ -464,6 +430,15 @@ export const HabitsCard: React.FC<HabitsCardProps> = ({
         })}
       </div>
 
+      {/* Past 7 Days Summary Card for Selected Habits */}
+      <PastSevenDaysSummaryCard
+        state={state}
+        selectedDate={selectedDate}
+        selectedHabits={filteredHabits}
+        selectedCategory={selectedCategory}
+        onSelectDate={onSelectDate}
+      />
+
       {/* HABITS LIST (WITH STAGGERED FLUID FRAMER MOTION TRANSITIONS) */}
       <div className="space-y-2.5 sm:space-y-3 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-3 md:space-y-0">
         <AnimatePresence mode="popLayout">
@@ -472,7 +447,7 @@ export const HabitsCard: React.FC<HabitsCardProps> = ({
             const target = targets[def.key];
             const currentValue = Number(dayRecord[def.key as keyof DayRecord]) || 0;
             const progressPct = def.type === 'number'
-              ? Math.min(100, Math.round((currentValue / target) * 100))
+              ? target > 0 ? Math.min(100, Math.round((currentValue / target) * 100)) : 100
               : isDone ? 100 : 0;
             const quickPills = QUICK_INCREMENTS[def.key] || [];
 
@@ -540,9 +515,7 @@ export const HabitsCard: React.FC<HabitsCardProps> = ({
 
                   {/* Subtitle / Cues */}
                   <p className="mt-1.5 text-[11px] text-zinc-500 dark:text-zinc-400 line-clamp-1">
-                    {def.key === 'workout' && phase === 'home'
-                      ? `Split: ${routine.title.split('//')[0].trim()} · ${routine.subtitle}`
-                      : def.description}
+                    {def.description}
                   </p>
                 </div>
 
@@ -574,7 +547,7 @@ export const HabitsCard: React.FC<HabitsCardProps> = ({
                           </motion.button>
                         </div>
 
-                        {/* 1-Tap Quick Increment Chips (Essential for mobile speed) */}
+                        {/* 1-Tap Quick Increment Chips */}
                         {quickPills.length > 0 && (
                           <div className="flex items-center gap-1">
                             {quickPills.map((amt) => (
@@ -585,7 +558,7 @@ export const HabitsCard: React.FC<HabitsCardProps> = ({
                                 onClick={() => handleQuickSetOrAdd(def.key, amt)}
                                 className="text-[10px] font-mono font-semibold py-1.5 px-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 transition-colors cursor-pointer"
                               >
-                                {def.key === 'sleep' ? `${amt}h` : `+${amt}`}
+                                +{amt}
                               </motion.button>
                             ))}
                           </div>
@@ -623,50 +596,22 @@ export const HabitsCard: React.FC<HabitsCardProps> = ({
                   ) : (
                     /* Boolean Checkbox Controls (Big touch target for mobile) */
                     <div className="flex items-center justify-between gap-2">
-                      {def.key === 'workout' ? (
-                        <>
-                          <button
-                            type="button"
-                            onClick={onNavigateToWorkout}
-                            className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-zinc-100 underline decoration-zinc-300 dark:decoration-zinc-700 underline-offset-2 flex items-center gap-1 cursor-pointer"
-                          >
-                            <span>{routine.type === 'recovery' ? 'Recovery Guide' : 'Routine Sets'}</span>
-                            <ArrowRight className="w-3 h-3" />
-                          </button>
-                          <motion.button
-                            whileTap={{ scale: 0.94 }}
-                            type="button"
-                            onClick={() => handleToggle('workout')}
-                            className={`min-h-[40px] px-4 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
-                              isDone
-                                ? 'bg-emerald-600 text-white shadow-xs'
-                                : 'bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700'
-                            }`}
-                          >
-                            <Check className={`w-4 h-4 ${isDone ? 'stroke-[3]' : ''}`} />
-                            <span>{isDone ? 'Session Logged' : 'Mark Session Done'}</span>
-                          </motion.button>
-                        </>
-                      ) : (
-                        <>
-                          <span className="text-[11px] text-zinc-500 dark:text-zinc-400 font-mono">
-                            {isDone ? 'Standard Compliant' : 'Pending Verification'}
-                          </span>
-                          <motion.button
-                            whileTap={{ scale: 0.94 }}
-                            type="button"
-                            onClick={() => handleToggle(def.key as keyof DayRecord)}
-                            className={`min-h-[40px] px-4 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
-                              isDone
-                                ? 'bg-emerald-600 text-white shadow-xs'
-                                : 'bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700'
-                            }`}
-                          >
-                            <Check className={`w-4 h-4 ${isDone ? 'stroke-[3]' : ''}`} />
-                            <span>{isDone ? 'Completed' : 'Check Off'}</span>
-                          </motion.button>
-                        </>
-                      )}
+                      <span className="text-[11px] text-zinc-500 dark:text-zinc-400 font-mono">
+                        {isDone ? 'Standard Compliant' : 'Pending Verification'}
+                      </span>
+                      <motion.button
+                        whileTap={{ scale: 0.94 }}
+                        type="button"
+                        onClick={() => handleToggle(def.key as keyof DayRecord)}
+                        className={`min-h-[40px] px-4 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+                          isDone
+                            ? 'bg-emerald-600 text-white shadow-xs'
+                            : 'bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700'
+                        }`}
+                      >
+                        <Check className={`w-4 h-4 ${isDone ? 'stroke-[3]' : ''}`} />
+                        <span>{isDone ? 'Completed' : 'Check Off'}</span>
+                      </motion.button>
                     </div>
                   )}
                 </div>

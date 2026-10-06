@@ -1,6 +1,7 @@
 import React from 'react';
 import { StreakStats } from '../types';
-import { Flame, Trophy, Sparkles, TrendingUp, Calendar, Zap, ShieldCheck } from 'lucide-react';
+import { Flame, Trophy, Sparkles, TrendingUp, ShieldCheck } from 'lucide-react';
+import { DISCIPLINE_THRESHOLD, TOTAL_HABITS } from '../utils/arcEngine';
 
 interface StreakSummaryCardProps {
   streakStats: StreakStats;
@@ -146,7 +147,7 @@ export const StreakSummaryCard: React.FC<StreakSummaryCardProps> = ({ streakStat
                 {totalCompletedDays}
               </span>
               <span className="text-[11px] font-medium font-mono text-zinc-500 dark:text-zinc-400">
-                Days ≥ 7/9
+                Days ≥ {DISCIPLINE_THRESHOLD}/{TOTAL_HABITS}
               </span>
             </div>
 

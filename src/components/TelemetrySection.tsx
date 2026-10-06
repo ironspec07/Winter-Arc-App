@@ -3,13 +3,13 @@ import { AppState } from '../types';
 import { 
   START_DATE, 
   END_DATE, 
-  GYM_DATE, 
   getStreakStats, 
   getCompletedHabitCount, 
   HABIT_DEFINITIONS, 
   isHabitComplete, 
-  parseISODate, 
-  toISODate
+  toISODate,
+  TOTAL_HABITS,
+  DISCIPLINE_THRESHOLD
 } from '../utils/arcEngine';
 import { 
   ChevronLeft, 
@@ -22,6 +22,7 @@ import {
   TrendingUp
 } from 'lucide-react';
 import { HabitTrendChart } from './HabitTrendChart';
+import { SevenDayHabitBarChart } from './SevenDayHabitBarChart';
 
 interface TelemetrySectionProps {
   state: AppState;
@@ -29,7 +30,7 @@ interface TelemetrySectionProps {
   onSelectDate: (date: string) => void;
 }
 
-const ARC_MONTHS = ['2026-09', '2026-10', '2026-11', '2026-12'];
+const ARC_MONTHS = ['2026-10', '2026-11', '2026-12'];
 
 export const TelemetrySection: React.FC<TelemetrySectionProps> = ({
   state,
@@ -40,7 +41,8 @@ export const TelemetrySection: React.FC<TelemetrySectionProps> = ({
   const stats = getStreakStats(state, todayIso);
 
   const [activeMonth, setActiveMonth] = useState<string>(() => {
-    return selectedDate.slice(0, 7) || '2026-09';
+    const m = selectedDate.slice(0, 7);
+    return ARC_MONTHS.includes(m) ? m : '2026-10';
   });
 
   const handlePrevMonth = () => {
@@ -75,7 +77,7 @@ export const TelemetrySection: React.FC<TelemetrySectionProps> = ({
     const eligibleDays = dates.length;
     const trackedDays = dates.filter(d => state.days[d] && getCompletedHabitCount(state.days[d], d) > 0).length;
     const totalScore = dates.reduce((sum, d) => sum + getCompletedHabitCount(state.days[d], d), 0);
-    const avgScorePct = eligibleDays > 0 ? Math.round((totalScore / (eligibleDays * 9)) * 100) : 0;
+    const avgScorePct = eligibleDays > 0 ? Math.round((totalScore / (eligibleDays * TOTAL_HABITS)) * 100) : 0;
 
     return {
       monthStr: mStr,
@@ -111,7 +113,7 @@ export const TelemetrySection: React.FC<TelemetrySectionProps> = ({
               </span>
               <span className="text-zinc-300 dark:text-zinc-700">·</span>
               <span className="text-[10px] sm:text-[11px] font-mono text-zinc-500 dark:text-zinc-400">
-                17 Sep – 31 Dec 2026
+                06 Oct – 31 Dec 2026
               </span>
             </div>
             <h2 className="mt-1 text-2xl sm:text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-50 font-mono">
@@ -141,9 +143,9 @@ export const TelemetrySection: React.FC<TelemetrySectionProps> = ({
             />
           </div>
           <div className="flex justify-between items-center text-[9px] sm:text-[10px] font-mono text-zinc-400 dark:text-zinc-500 mt-1.5">
-            <span>Sep 17</span>
-            <span>Oct 5 (Gym)</span>
-            <span>Dec 31</span>
+            <span>Oct 6 (Start)</span>
+            <span>Nov 15 (Midpoint)</span>
+            <span>Dec 31 (Finish)</span>
           </div>
         </div>
       </div>
@@ -159,7 +161,7 @@ export const TelemetrySection: React.FC<TelemetrySectionProps> = ({
             {stats.currentStreak} <span className="text-xs font-normal text-zinc-500">days</span>
           </div>
           <p className="mt-0.5 text-[10px] sm:text-[11px] text-zinc-500 dark:text-zinc-400 truncate">
-            Days ≥ 7/9 habits
+            Days ≥ {DISCIPLINE_THRESHOLD}/{TOTAL_HABITS} habits
           </p>
         </div>
 
@@ -202,6 +204,12 @@ export const TelemetrySection: React.FC<TelemetrySectionProps> = ({
           </p>
         </div>
       </div>
+
+      {/* 7-Day Core Habits Completion Bar Chart */}
+      <SevenDayHabitBarChart
+        state={state}
+        selectedDate={selectedDate}
+      />
 
       {/* 30-Day Habit Completion Trends Recharts Line Chart */}
       <HabitTrendChart
@@ -273,9 +281,9 @@ export const TelemetrySection: React.FC<TelemetrySectionProps> = ({
 
               let statusColor = 'border-zinc-200/70 dark:border-zinc-800/70 bg-zinc-50/50 dark:bg-zinc-900/40 text-zinc-600 dark:text-zinc-400';
               if (inArc && state.days[dateIso]) {
-                if (completedHabits >= 8) {
+                if (completedHabits >= DISCIPLINE_THRESHOLD) {
                   statusColor = 'border-emerald-300 dark:border-emerald-800 bg-emerald-50/60 dark:bg-emerald-950/30 text-emerald-900 dark:text-emerald-200';
-                } else if (completedHabits >= 5) {
+                } else if (completedHabits >= 3) {
                   statusColor = 'border-amber-300 dark:border-amber-800 bg-amber-50/60 dark:bg-amber-950/30 text-amber-900 dark:text-amber-200';
                 } else if (completedHabits > 0) {
                   statusColor = 'border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800/80 text-zinc-800 dark:text-zinc-200';
@@ -301,17 +309,12 @@ export const TelemetrySection: React.FC<TelemetrySectionProps> = ({
                     }`}>
                       {dayNum}
                     </span>
-                    {inArc && dateIso < GYM_DATE && (
-                      <span className="text-[7px] sm:text-[8px] font-mono text-zinc-400 hidden sm:inline">
-                        PPL
-                      </span>
-                    )}
                   </div>
 
                   <div className="text-right">
                     {inArc && state.days[dateIso] && completedHabits > 0 ? (
                       <span className="text-[9px] sm:text-[10px] font-mono font-bold">
-                        {completedHabits}/9
+                        {completedHabits}/{TOTAL_HABITS}
                       </span>
                     ) : inArc ? (
                       <span className="text-[9px] sm:text-[10px] font-mono text-zinc-300 dark:text-zinc-700">—</span>
@@ -328,11 +331,11 @@ export const TelemetrySection: React.FC<TelemetrySectionProps> = ({
             <div className="flex items-center gap-3 sm:gap-4">
               <span className="flex items-center gap-1.5">
                 <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-xs sm:rounded-sm bg-emerald-400 dark:bg-emerald-600" />
-                8–9 Protocols
+                6–7 Protocols
               </span>
               <span className="flex items-center gap-1.5">
                 <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-xs sm:rounded-sm bg-amber-400 dark:bg-amber-600" />
-                5–7 Protocols
+                4–5 Protocols
               </span>
             </div>
             <span className="hidden sm:inline text-zinc-400">Tap day to inspect</span>
@@ -341,7 +344,7 @@ export const TelemetrySection: React.FC<TelemetrySectionProps> = ({
 
         {/* Right Col: Monthly Summaries & Habit Breakdown */}
         <div className="space-y-4 sm:space-y-6">
-          {/* 4 Month Performance Cards */}
+          {/* 3 Month Performance Cards */}
           <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 p-4 sm:p-5 shadow-xs">
             <h3 className="text-xs font-bold uppercase tracking-wider font-mono text-zinc-500 dark:text-zinc-400 mb-3">
               Monthly Campaign Blocks

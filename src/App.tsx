@@ -6,14 +6,12 @@ import {
   toISODate, 
   getCompletedHabitCount, 
   getStreakStats,
-  START_DATE,
-  END_DATE
+  START_DATE
 } from './utils/arcEngine';
 import { Header } from './components/Header';
 import { WeekRibbon } from './components/WeekRibbon';
 import { MobileNav } from './components/MobileNav';
 import { HabitsCard } from './components/HabitsCard';
-import { WorkoutSection } from './components/WorkoutSection';
 import { TelemetrySection } from './components/TelemetrySection';
 import { MissionsSection } from './components/MissionsSection';
 import { CheckCircle2, AlertTriangle, X } from 'lucide-react';
@@ -45,8 +43,7 @@ export default function App() {
   const [state, setState] = useState<AppState>(() => loadStoredState());
   const [selectedDate, setSelectedDate] = useState<string>(() => {
     const today = toISODate(new Date());
-    // If today is within or near arc, use today; otherwise clamp to start
-    return today;
+    return today < START_DATE ? START_DATE : today;
   });
   const [activeTab, setActiveTab] = useState<ActiveTab>('overview');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -70,14 +67,12 @@ export default function App() {
     setState(prev => {
       const currentDay = prev.days[selectedDate] || {
         steps: 0,
-        reading: 0,
         study: 0,
-        water: 0,
-        sleep: 0,
         jobs: 0,
-        hygiene: false,
-        discipline: false,
         workout: false,
+        discipline: false,
+        water: 0,
+        hygiene: false,
         ex: {},
         workoutNotes: '',
       };
@@ -98,7 +93,7 @@ export default function App() {
     try {
       const backupData = {
         app: 'Winter Habitat',
-        schemaVersion: 2,
+        schemaVersion: 3,
         exportedAt: new Date().toISOString(),
         state,
       };
@@ -133,7 +128,7 @@ export default function App() {
         }
 
         setState(prev => ({
-          version: 2,
+          version: 3,
           days: { ...prev.days, ...importedState.days },
           dailyTodos: { ...prev.dailyTodos, ...(importedState.dailyTodos || {}) },
           monthlyObjectives: { ...prev.monthlyObjectives, ...(importedState.monthlyObjectives || importedState.monthlyTodos || {}) },
@@ -152,7 +147,7 @@ export default function App() {
   // Reset data handler
   const handleConfirmReset = useCallback(() => {
     setState({
-      version: 2,
+      version: 3,
       days: {},
       dailyTodos: {},
       monthlyObjectives: {},
@@ -164,14 +159,12 @@ export default function App() {
 
   const currentDayRecord: DayRecord = state.days[selectedDate] || {
     steps: 0,
-    reading: 0,
     study: 0,
-    water: 0,
-    sleep: 0,
     jobs: 0,
-    hygiene: false,
-    discipline: false,
     workout: false,
+    discipline: false,
+    water: 0,
+    hygiene: false,
     ex: {},
     workoutNotes: '',
   };
@@ -196,7 +189,7 @@ export default function App() {
       {/* Main Workspace Body */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-7 pb-24 md:pb-10">
         {/* Quick 7-day ribbon for easy day jumping */}
-        {(activeTab === 'overview' || activeTab === 'workout') && (
+        {activeTab === 'overview' && (
           <WeekRibbon
             selectedDate={selectedDate}
             onSelectDate={setSelectedDate}
@@ -218,25 +211,8 @@ export default function App() {
                 dayRecord={currentDayRecord}
                 state={state}
                 onUpdateDay={handleUpdateDay}
-                onNavigateToWorkout={() => setActiveTab('workout')}
                 onSelectDate={setSelectedDate}
                 streakStats={streakStats}
-              />
-            </motion.div>
-          )}
-
-          {activeTab === 'workout' && (
-            <motion.div
-              key="workout"
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -4 }}
-              transition={{ duration: 0.18, ease: 'easeOut' }}
-            >
-              <WorkoutSection
-                selectedDate={selectedDate}
-                dayRecord={currentDayRecord}
-                onUpdateDay={handleUpdateDay}
               />
             </motion.div>
           )}
@@ -345,7 +321,7 @@ export default function App() {
             </div>
 
             <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed mb-6">
-              This will erase all logged habits, workout records, daily missions, and notes from your browser's local storage. This action cannot be undone. Consider exporting a JSON backup first.
+              This will erase all logged habits, daily missions, and notes from your browser's local storage. This action cannot be undone. Consider exporting a JSON backup first.
             </p>
 
             <div className="flex items-center justify-end gap-2.5">

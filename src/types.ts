@@ -1,18 +1,16 @@
 export type HabitKey =
   | 'steps'
-  | 'reading'
   | 'study'
-  | 'water'
-  | 'sleep'
   | 'jobs'
-  | 'hygiene'
+  | 'workout'
   | 'discipline'
-  | 'workout';
+  | 'water'
+  | 'hygiene';
 
 export interface HabitDefinition {
   key: HabitKey;
   label: string;
-  category: 'Physical' | 'Intellectual' | 'Discipline' | 'Recovery';
+  category: 'Physical' | 'Intellectual' | 'Discipline';
   unit: string;
   step: number;
   type: 'number' | 'check';
@@ -23,14 +21,12 @@ export interface HabitDefinition {
 
 export interface DayRecord {
   steps: number;
-  reading: number;
   study: number;
-  water: number;
-  sleep: number;
   jobs: number;
-  hygiene: boolean;
-  discipline: boolean;
   workout: boolean;
+  discipline: boolean;
+  water: number;
+  hygiene: boolean;
   ex?: Record<number, boolean>;
   workoutNotes?: string;
   updatedAt?: string;
@@ -78,4 +74,4 @@ export interface StreakStats {
   daysRemaining: number;
 }
 
-export type ActiveTab = 'overview' | 'workout' | 'telemetry' | 'missions' | 'settings';
+export type ActiveTab = 'overview' | 'telemetry' | 'missions' | 'settings';

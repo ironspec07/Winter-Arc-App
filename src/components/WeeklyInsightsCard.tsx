@@ -1,13 +1,13 @@
 import React, { useState, useMemo } from 'react';
 import { AppState } from '../types';
 import { generateWeeklyReport } from '../utils/weeklyInsights';
+import { TOTAL_HABITS, DISCIPLINE_THRESHOLD } from '../utils/arcEngine';
 import { 
   Sparkles, 
   TrendingUp, 
   TrendingDown, 
   Minus, 
   ShieldCheck, 
-  Target, 
   ChevronDown, 
   ChevronUp, 
   CheckCircle2, 
@@ -138,9 +138,9 @@ export const WeeklyInsightsCard: React.FC<WeeklyInsightsCardProps> = ({
                   <div className="mt-2 h-1.5 w-full bg-zinc-200/80 dark:bg-zinc-700 rounded-full overflow-hidden">
                     <div 
                       className={`h-full rounded-full transition-all ${
-                        report.completionPercentage >= 78 
+                        report.completionPercentage >= 83 
                           ? 'bg-emerald-500' 
-                          : report.completionPercentage >= 56 
+                          : report.completionPercentage >= 50 
                           ? 'bg-amber-500' 
                           : 'bg-zinc-900 dark:bg-zinc-100'
                       }`}
@@ -160,11 +160,11 @@ export const WeeklyInsightsCard: React.FC<WeeklyInsightsCardProps> = ({
                       {report.disciplineDays}
                     </span>
                     <span className="text-[10px] font-mono text-zinc-400">
-                      of 7 days (≥7/9)
+                      of 7 days (≥{DISCIPLINE_THRESHOLD}/{TOTAL_HABITS})
                     </span>
                   </div>
                   <div className="mt-1.5 text-[10px] font-mono text-zinc-500 dark:text-zinc-400">
-                    {report.eliteDays} elite days (≥8/9)
+                    {report.eliteDays} elite days ({TOTAL_HABITS}/{TOTAL_HABITS})
                   </div>
                 </div>
 
@@ -212,11 +212,11 @@ export const WeeklyInsightsCard: React.FC<WeeklyInsightsCardProps> = ({
                   {report.dailyScores.map((day) => {
                     const isSelected = day.date === selectedDate;
                     let dotColor = 'bg-zinc-200 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-600';
-                    if (day.score >= 8) {
+                    if (day.score >= TOTAL_HABITS) {
                       dotColor = 'bg-emerald-500 text-white';
-                    } else if (day.score >= 7) {
+                    } else if (day.score >= DISCIPLINE_THRESHOLD) {
                       dotColor = 'bg-emerald-600 dark:bg-emerald-500 text-white';
-                    } else if (day.score >= 5) {
+                    } else if (day.score >= 3) {
                       dotColor = 'bg-amber-500 text-white';
                     } else if (day.score > 0) {
                       dotColor = 'bg-zinc-600 dark:bg-zinc-500 text-white';
@@ -246,7 +246,7 @@ export const WeeklyInsightsCard: React.FC<WeeklyInsightsCardProps> = ({
                             ? 'bg-white/20 dark:bg-black/20 text-white dark:text-zinc-950'
                             : dotColor
                         }`}>
-                          {day.score}/9
+                          {day.score}/{TOTAL_HABITS}
                         </span>
                       </button>
                     );

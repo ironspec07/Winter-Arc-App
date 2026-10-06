@@ -6,7 +6,9 @@ import {
   toISODate, 
   getCompletedHabitCount, 
   START_DATE, 
-  END_DATE 
+  END_DATE,
+  TOTAL_HABITS,
+  DISCIPLINE_THRESHOLD
 } from '../utils/arcEngine';
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon } from 'lucide-react';
 import { motion } from 'motion/react';
@@ -89,14 +91,14 @@ export const WeekRibbon: React.FC<WeekRibbonProps> = ({
           const inArc = dateIso >= START_DATE && dateIso <= END_DATE;
           const completedCount = getCompletedHabitCount(state.days[dateIso], dateIso);
 
-          const dayLetter = d.toLocaleDateString(undefined, { weekday: 'short' }); // e.g. Mon, Tue
+          const dayLetter = d.toLocaleDateString(undefined, { weekday: 'short' });
           const dayNum = d.getDate();
 
           let indicatorBadge = 'bg-transparent text-zinc-400 dark:text-zinc-600';
           if (inArc && state.days[dateIso] && completedCount > 0) {
-            if (completedCount >= 8) {
+            if (completedCount >= DISCIPLINE_THRESHOLD) {
               indicatorBadge = 'bg-emerald-500 text-white';
-            } else if (completedCount >= 5) {
+            } else if (completedCount >= 3) {
               indicatorBadge = 'bg-amber-500 text-white';
             } else {
               indicatorBadge = 'bg-zinc-400 text-white dark:bg-zinc-600';
@@ -139,7 +141,7 @@ export const WeekRibbon: React.FC<WeekRibbonProps> = ({
                       ? 'bg-white/20 dark:bg-black/20 text-white dark:text-zinc-950'
                       : indicatorBadge
                   }`}>
-                    {completedCount}/9
+                    {completedCount}/{TOTAL_HABITS}
                   </span>
                 ) : (
                   <span className={`w-1.5 h-1.5 rounded-full ${

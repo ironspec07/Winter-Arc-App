@@ -7,7 +7,9 @@ import {
   isHabitComplete, 
   HABIT_DEFINITIONS,
   START_DATE,
-  END_DATE 
+  END_DATE,
+  TOTAL_HABITS,
+  DISCIPLINE_THRESHOLD
 } from './arcEngine';
 
 export interface WeeklyReport {
@@ -18,8 +20,8 @@ export interface WeeklyReport {
   totalHabitsCompleted: number;
   totalHabitsPossible: number;
   completionPercentage: number;
-  disciplineDays: number; // days >= 7/9
-  eliteDays: number; // days >= 8/9
+  disciplineDays: number; // days >= 5/6
+  eliteDays: number; // days == 6/6
   daysWithActivity: number;
   prevWeekPercentage: number | null;
   deltaPercentage: number | null;
@@ -63,7 +65,7 @@ export function generateWeeklyReport(state: AppState, anchorDateIso: string): We
   const formattedRange = `${startDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} – ${endDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}`;
 
   const daysInArc = weekDays.filter(d => d >= START_DATE && d <= END_DATE);
-  const totalHabitsPossible = (daysInArc.length > 0 ? daysInArc.length : 7) * 9;
+  const totalHabitsPossible = (daysInArc.length > 0 ? daysInArc.length : 7) * TOTAL_HABITS;
 
   let totalHabitsCompleted = 0;
   let disciplineDays = 0;
@@ -74,14 +76,12 @@ export function generateWeeklyReport(state: AppState, anchorDateIso: string): We
   // Track habit frequencies
   const habitCompletionCounts: Record<HabitKey, number> = {
     steps: 0,
-    reading: 0,
     study: 0,
-    water: 0,
-    sleep: 0,
     jobs: 0,
-    hygiene: 0,
-    discipline: 0,
     workout: 0,
+    discipline: 0,
+    water: 0,
+    hygiene: 0,
   };
 
   const dailyScores = weekDays.map((iso) => {
@@ -89,9 +89,9 @@ export function generateWeeklyReport(state: AppState, anchorDateIso: string): We
     const dayRec = state.days[iso];
     const inArc = iso >= START_DATE && iso <= END_DATE;
     const score = inArc && dayRec ? getCompletedHabitCount(dayRec, iso) : 0;
-    const percentage = Math.round((score / 9) * 100);
-    const isThresholdMet = score >= 7;
-    const isElite = score >= 8;
+    const percentage = Math.round((score / TOTAL_HABITS) * 100);
+    const isThresholdMet = score >= DISCIPLINE_THRESHOLD;
+    const isElite = score >= TOTAL_HABITS;
 
     if (inArc && score > 0) {
       daysWithActivity++;
@@ -144,7 +144,7 @@ export function generateWeeklyReport(state: AppState, anchorDateIso: string): We
         prevTotalCompleted += getCompletedHabitCount(rec, d);
       }
     });
-    const prevPossible = prevDaysInArc.length * 9;
+    const prevPossible = prevDaysInArc.length * TOTAL_HABITS;
     prevWeekPercentage = Math.round((prevTotalCompleted / prevPossible) * 100);
     deltaPercentage = completionPercentage - prevWeekPercentage;
   }
@@ -180,21 +180,21 @@ export function generateWeeklyReport(state: AppState, anchorDateIso: string): We
   let actionableCue = '';
 
   if (totalHabitsCompleted === 0) {
-    summaryNarrative = 'No protocol activity logged for this week window. Select any day in the ribbon to check off morning hydration, reading, or baseline steps.';
-    actionableCue = 'Clear your hydration and step targets before noon to seed daily momentum.';
+    summaryNarrative = 'No protocol activity logged for this week window. Select any day in the ribbon to check off morning hydration, study, or baseline steps.';
+    actionableCue = 'Clear your hydration and step targets early to seed daily momentum.';
   } else if (completionPercentage >= 85) {
     tierBadge = {
       title: 'Elite Execution',
       color: 'bg-emerald-500 text-white shadow-xs',
     };
-    summaryNarrative = `Uncompromising week with ${disciplineDays} of ${activeDaysCount} days hitting the discipline threshold (≥7/9 habits). ${
+    summaryNarrative = `Uncompromising week with ${disciplineDays} of ${activeDaysCount} days hitting the discipline threshold (≥6/7 habits). ${
       strongestHabit ? `Your ${strongestHabit.label.toLowerCase()} was rock solid at ${strongestHabit.completedDays}/${activeDaysCount} days.` : ''
     } Overall volume is operating at championship caliber.`;
-    actionableCue = 'Sustain your sleep and active recovery protocols to prevent accumulated fatigue.';
+    actionableCue = 'Sustain your hydration and physical training consistency through the weekend.';
   } else if (completionPercentage >= 65) {
     tierBadge = {
       title: 'Strong Momentum',
-      color: 'bg-emerald-100 text-emerald-900 dark:bg-emerald-950/70 dark:text-emerald-300 border-emerald-300/80 dark:border-emerald-800',
+      color: 'bg-emerald-100 text-emerald-900 dark:bg-emerald-950/70 dark:text-emerald-300 border border-emerald-300/80 dark:border-emerald-800',
     };
     summaryNarrative = `Consistent execution this week with ${disciplineDays} threshold days logged. ${
       strongestHabit ? `${strongestHabit.label} anchored your protocol with ${strongestHabit.percentage}% compliance.` : ''
@@ -206,20 +206,20 @@ export function generateWeeklyReport(state: AppState, anchorDateIso: string): We
     actionableCue = laggingHabit
       ? `Schedule a dedicated recurring block for ${laggingHabit.label.toLowerCase()} early in your routine.`
       : 'Maintain steady pacing through the weekend to protect your streak.';
-  } else if (completionPercentage >= 45) {
+  } else if (completionPercentage >= 50) {
     tierBadge = {
       title: 'Baseline Standard Active',
       color: 'bg-amber-100 text-amber-900 dark:bg-amber-950/70 dark:text-amber-300 border-amber-300/80 dark:border-amber-800',
     };
     summaryNarrative = `Moderate protocol compliance this week with ${totalHabitsCompleted} total standards completed. You achieved the discipline threshold on ${disciplineDays} day${disciplineDays === 1 ? '' : 's'}.`;
-    actionableCue = 'Target closing at least 7 standards today to raise your weekly consistency average above 65%.';
+    actionableCue = 'Target closing at least 5 standards today to raise your weekly consistency average.';
   } else {
     tierBadge = {
       title: 'Building Velocity',
       color: 'bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200 border-zinc-200 dark:border-zinc-700',
     };
     summaryNarrative = `Early week traction with ${totalHabitsCompleted} completed habits. Discipline compounds exponentially when consecutive days are chained together.`;
-    actionableCue = 'Focus on the non-negotiables: 3L water, 7,000 steps, and 2× oral hygiene.';
+    actionableCue = 'Focus on the non-negotiables: 3L water, 10,000 steps, and dopamine discipline.';
   }
 
   return {

@@ -5,7 +5,9 @@ import {
   END_DATE, 
   getCompletedHabitCount, 
   parseISODate, 
-  toISODate 
+  toISODate,
+  TOTAL_HABITS,
+  DISCIPLINE_THRESHOLD
 } from '../utils/arcEngine';
 import { 
   ResponsiveContainer, 
@@ -18,7 +20,6 @@ import {
   ReferenceLine 
 } from 'recharts';
 import { TrendingUp, Activity, CheckCircle2, Zap } from 'lucide-react';
-import { motion } from 'motion/react';
 
 interface HabitTrendChartProps {
   state: AppState;
@@ -47,7 +48,6 @@ export const HabitTrendChart: React.FC<HabitTrendChartProps> = ({
 
   // Generate trailing 30-day window ending at selectedDate or today (whichever is later in the arc)
   const chartData = useMemo<TrendPoint[]>(() => {
-    // Anchor point: latest of selectedDate and todayIso
     const anchorDateIso = selectedDate > todayIso ? selectedDate : todayIso;
     const anchor = parseISODate(anchorDateIso);
 
@@ -60,7 +60,7 @@ export const HabitTrendChart: React.FC<HabitTrendChartProps> = ({
       const inArc = iso >= START_DATE && iso <= END_DATE;
       const dayRec = state.days[iso];
       const completed = inArc && dayRec ? getCompletedHabitCount(dayRec, iso) : 0;
-      const percentage = Math.round((completed / 9) * 100);
+      const percentage = Math.round((completed / TOTAL_HABITS) * 100);
 
       points.push({
         date: iso,
@@ -83,9 +83,9 @@ export const HabitTrendChart: React.FC<HabitTrendChartProps> = ({
     const count = trackedPoints.length || 1;
     const totalHabits = trackedPoints.reduce((acc, p) => acc + p.completed, 0);
     const avgCompleted = (totalHabits / count).toFixed(1);
-    const avgPercentage = Math.round((totalHabits / (count * 9)) * 100);
-    const thresholdDays = trackedPoints.filter(p => p.completed >= 7).length;
-    const eliteDays = trackedPoints.filter(p => p.completed >= 8).length;
+    const avgPercentage = Math.round((totalHabits / (count * TOTAL_HABITS)) * 100);
+    const thresholdDays = trackedPoints.filter(p => p.completed >= DISCIPLINE_THRESHOLD).length;
+    const eliteDays = trackedPoints.filter(p => p.completed >= TOTAL_HABITS).length;
 
     return {
       avgCompleted,
@@ -131,7 +131,7 @@ export const HabitTrendChart: React.FC<HabitTrendChartProps> = ({
                 : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200'
             }`}
           >
-            Habits (0–9)
+            Habits (0–{TOTAL_HABITS})
           </button>
           <button
             type="button"
@@ -174,7 +174,7 @@ export const HabitTrendChart: React.FC<HabitTrendChartProps> = ({
               {stats.thresholdDays}
             </span>
             <span className="text-[11px] font-mono text-zinc-500 dark:text-zinc-400">
-              of {stats.totalTracked} (≥ 7/9)
+              of {stats.totalTracked} (≥ {DISCIPLINE_THRESHOLD}/{TOTAL_HABITS})
             </span>
           </div>
         </div>
@@ -189,7 +189,7 @@ export const HabitTrendChart: React.FC<HabitTrendChartProps> = ({
               {stats.eliteDays}
             </span>
             <span className="text-[11px] font-mono text-zinc-500 dark:text-zinc-400">
-              days (≥ 8/9)
+              days ({TOTAL_HABITS}/{TOTAL_HABITS})
             </span>
           </div>
         </div>
@@ -238,8 +238,8 @@ export const HabitTrendChart: React.FC<HabitTrendChartProps> = ({
             />
 
             <YAxis
-              domain={metricMode === 'count' ? [0, 9] : [0, 100]}
-              ticks={metricMode === 'count' ? [0, 3, 5, 7, 9] : [0, 25, 50, 75, 100]}
+              domain={metricMode === 'count' ? [0, TOTAL_HABITS] : [0, 100]}
+              ticks={metricMode === 'count' ? [0, 2, 4, 6, 7] : [0, 25, 57, 86, 100]}
               tickLine={false}
               axisLine={{ stroke: 'currentColor', className: 'text-zinc-300 dark:text-zinc-700' }}
               tick={{ fontSize: 10, fill: 'currentColor' }}
@@ -249,12 +249,12 @@ export const HabitTrendChart: React.FC<HabitTrendChartProps> = ({
 
             {/* Threshold Reference Line */}
             <ReferenceLine
-              y={metricMode === 'count' ? 7 : 78}
+              y={metricMode === 'count' ? DISCIPLINE_THRESHOLD : 86}
               stroke="#10b981"
               strokeDasharray="4 4"
               strokeWidth={1.5}
               label={{
-                value: metricMode === 'count' ? 'Threshold (7)' : 'Threshold (78%)',
+                value: metricMode === 'count' ? 'Threshold (6)' : 'Threshold (86%)',
                 position: 'insideTopRight',
                 fill: '#10b981',
                 fontSize: 10,
@@ -265,12 +265,12 @@ export const HabitTrendChart: React.FC<HabitTrendChartProps> = ({
 
             {/* Baseline Reference Line */}
             <ReferenceLine
-              y={metricMode === 'count' ? 5 : 56}
+              y={metricMode === 'count' ? 4 : 57}
               stroke="#f59e0b"
               strokeDasharray="3 3"
               strokeWidth={1}
               label={{
-                value: metricMode === 'count' ? 'Baseline (5)' : 'Baseline (56%)',
+                value: metricMode === 'count' ? 'Baseline (4)' : 'Baseline (57%)',
                 position: 'insideBottomRight',
                 fill: '#f59e0b',
                 fontSize: 9,
@@ -288,13 +288,13 @@ export const HabitTrendChart: React.FC<HabitTrendChartProps> = ({
 
                 let statusText = 'Pending Protocols';
                 let statusColor = 'text-zinc-500';
-                if (count >= 8) {
+                if (count >= TOTAL_HABITS) {
                   statusText = 'Elite Execution';
                   statusColor = 'text-emerald-500 font-bold';
-                } else if (count >= 7) {
+                } else if (count >= DISCIPLINE_THRESHOLD) {
                   statusText = 'Discipline Threshold Met';
                   statusColor = 'text-emerald-500';
-                } else if (count >= 5) {
+                } else if (count >= 3) {
                   statusText = 'Baseline Standard Active';
                   statusColor = 'text-amber-500';
                 }
@@ -316,7 +316,7 @@ export const HabitTrendChart: React.FC<HabitTrendChartProps> = ({
                       <div className="flex items-center justify-between gap-4">
                         <span className="text-zinc-500">Completed:</span>
                         <span className="font-bold text-zinc-900 dark:text-zinc-100">
-                          {count} of 9 ({pct}%)
+                          {count} of {TOTAL_HABITS} ({pct}%)
                         </span>
                       </div>
                       <div className="flex items-center justify-between gap-4">
@@ -342,7 +342,7 @@ export const HabitTrendChart: React.FC<HabitTrendChartProps> = ({
               dot={(props: any) => {
                 const { cx, cy, payload } = props;
                 const isSelected = payload.date === selectedDate;
-                const isCompliant = payload.completed >= 7;
+                const isCompliant = payload.completed >= DISCIPLINE_THRESHOLD;
 
                 return (
                   <circle
@@ -373,11 +373,11 @@ export const HabitTrendChart: React.FC<HabitTrendChartProps> = ({
         <div className="flex items-center gap-4 flex-wrap">
           <span className="flex items-center gap-1.5">
             <span className="w-2.5 h-0.5 bg-emerald-500 rounded-full" />
-            <span className="text-zinc-600 dark:text-zinc-400">Discipline Threshold (≥ 7 habits / 78%)</span>
+            <span className="text-zinc-600 dark:text-zinc-400">Discipline Threshold (≥ {DISCIPLINE_THRESHOLD} habits / 86%)</span>
           </span>
           <span className="flex items-center gap-1.5">
             <span className="w-2.5 h-0.5 bg-amber-500 rounded-full" />
-            <span className="text-zinc-600 dark:text-zinc-400">Baseline (5 habits / 56%)</span>
+            <span className="text-zinc-600 dark:text-zinc-400">Baseline (4 habits / 57%)</span>
           </span>
         </div>
         <span className="text-zinc-500 dark:text-zinc-400">
