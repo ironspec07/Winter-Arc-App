@@ -41,7 +41,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   const navItems: { id: ActiveTab; label: string; icon: React.ReactNode }[] = [
     { id: 'overview', label: 'Daily Habits', icon: <CheckCircle2 className="w-4 h-4" /> },
-    { id: 'workout', label: 'Workout', icon: <Dumbbell className="w-4 h-4 text-orange-500" /> },
+    { id: 'workout', label: 'Training', icon: <Dumbbell className="w-4 h-4" /> },
     { id: 'telemetry', label: 'Telemetry & Arc', icon: <BarChart3 className="w-4 h-4" /> },
     { id: 'missions', label: 'Missions & System', icon: <ListTodo className="w-4 h-4" /> },
   ];
