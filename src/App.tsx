@@ -12,6 +12,7 @@ import { Header } from './components/Header';
 import { WeekRibbon } from './components/WeekRibbon';
 import { MobileNav } from './components/MobileNav';
 import { HabitsCard } from './components/HabitsCard';
+import { WorkoutSection } from './components/WorkoutSection';
 import { TelemetrySection } from './components/TelemetrySection';
 import { MissionsSection } from './components/MissionsSection';
 import { CheckCircle2, AlertTriangle, X } from 'lucide-react';
@@ -62,17 +63,15 @@ export default function App() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Day record updater
+  // Day record updater (strictly 5 core habits)
   const handleUpdateDay = useCallback((updater: (prev: DayRecord) => DayRecord) => {
     setState(prev => {
-      const currentDay = prev.days[selectedDate] || {
+      const currentDay: DayRecord = prev.days[selectedDate] || {
         steps: 0,
-        study: 0,
-        jobs: 0,
-        workout: false,
         discipline: false,
-        water: 0,
-        hygiene: false,
+        study: 0,
+        workout: false,
+        jobs: 0,
         ex: {},
         workoutNotes: '',
       };
@@ -93,103 +92,107 @@ export default function App() {
     try {
       const backupData = {
         app: 'Winter Habitat',
-        schemaVersion: 3,
+        schemaVersion: 4,
+        startDate: START_DATE,
         exportedAt: new Date().toISOString(),
         state,
       };
 
-      const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `winter-habitat-backup-${selectedDate}.json`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-      showToast('Backup JSON exported successfully');
-    } catch (err) {
-      console.error('Failed to export backup:', err);
-      showToast('Export failed. Please check browser permissions.');
-    }
-  }, [state, selectedDate, showToast]);
+      const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(backupData, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute('href', dataStr);
+      downloadAnchor.setAttribute('download', `winter-habitat-nov-backup-${toISODate(new Date())}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
 
-  // JSON Restore
+      showToast('Workspace backup exported successfully');
+    } catch {
+      showToast('Failed to export backup data');
+    }
+  }, [state, showToast]);
+
+  // JSON Import
   const handleImportBackup = useCallback((file: File) => {
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
         const text = e.target?.result as string;
         const parsed = JSON.parse(text);
-        const importedState = parsed.state || parsed.data || parsed;
 
-        if (!importedState || typeof importedState.days !== 'object') {
-          throw new Error('Invalid Winter Arc schema');
+        if (!parsed || typeof parsed !== 'object') {
+          showToast('Invalid backup file format');
+          return;
         }
 
-        setState(prev => ({
-          version: 3,
-          days: { ...prev.days, ...importedState.days },
-          dailyTodos: { ...prev.dailyTodos, ...(importedState.dailyTodos || {}) },
-          monthlyObjectives: { ...prev.monthlyObjectives, ...(importedState.monthlyObjectives || importedState.monthlyTodos || {}) },
-          notes: { ...prev.notes, ...(importedState.notes || {}) },
-        }));
+        const importedState: AppState = parsed.state || parsed;
 
-        showToast('Backup restored successfully');
-      } catch (err) {
-        console.error('Failed to restore backup:', err);
-        showToast('Invalid backup file. Please select a valid Winter Arc JSON file.');
+        if (!importedState.days || typeof importedState.days !== 'object') {
+          showToast('Invalid data structure in backup file');
+          return;
+        }
+
+        setState({
+          days: importedState.days || {},
+          dailyTodos: importedState.dailyTodos || {},
+          monthlyObjectives: importedState.monthlyObjectives || {},
+          notes: importedState.notes || {},
+          version: 4,
+        });
+
+        showToast('Workspace successfully restored from backup');
+      } catch {
+        showToast('Error reading backup file');
       }
     };
     reader.readAsText(file);
   }, [showToast]);
 
-  // Reset data handler
+  // Factory Reset
   const handleConfirmReset = useCallback(() => {
+    localStorage.removeItem('winter_arc_workspace_nov_v1');
     setState({
-      version: 3,
       days: {},
       dailyTodos: {},
       monthlyObjectives: {},
       notes: {},
+      version: 4,
     });
     setShowResetConfirm(false);
-    showToast('All local tracker data has been reset');
+    showToast('All tracker data has been reset');
   }, [showToast]);
 
   const currentDayRecord: DayRecord = state.days[selectedDate] || {
     steps: 0,
-    study: 0,
-    jobs: 0,
-    workout: false,
     discipline: false,
-    water: 0,
-    hygiene: false,
+    study: 0,
+    workout: false,
+    jobs: 0,
     ex: {},
     workoutNotes: '',
   };
 
-  const completedCount = getCompletedHabitCount(currentDayRecord, selectedDate);
   const streakStats = getStreakStats(state, toISODate(new Date()));
+  const completedCount = getCompletedHabitCount(currentDayRecord, selectedDate);
 
   return (
-    <div className="min-h-screen flex flex-col bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 transition-colors">
-      {/* Navigation Header */}
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex flex-col font-sans transition-colors duration-200 antialiased selection:bg-zinc-900 selection:text-white dark:selection:bg-zinc-100 dark:selection:text-zinc-900">
+      {/* Top Application Header */}
       <Header
         selectedDate={selectedDate}
         onSelectDate={setSelectedDate}
         activeTab={activeTab}
         onTabChange={setActiveTab}
         isDark={isDark}
-        onToggleTheme={() => setIsDark(!isDark)}
+        onToggleTheme={() => setIsDark(prev => !prev)}
         onExport={handleExportBackup}
         completedCount={completedCount}
       />
 
-      {/* Main Workspace Body */}
+      {/* Main Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-7 pb-24 md:pb-10">
         {/* Quick 7-day ribbon for easy day jumping */}
-        {activeTab === 'overview' && (
+        {(activeTab === 'overview' || activeTab === 'workout') && (
           <WeekRibbon
             selectedDate={selectedDate}
             onSelectDate={setSelectedDate}
@@ -213,6 +216,23 @@ export default function App() {
                 onUpdateDay={handleUpdateDay}
                 onSelectDate={setSelectedDate}
                 streakStats={streakStats}
+                onNavigateToWorkout={() => setActiveTab('workout')}
+              />
+            </motion.div>
+          )}
+
+          {activeTab === 'workout' && (
+            <motion.div
+              key="workout"
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.18, ease: 'easeOut' }}
+            >
+              <WorkoutSection
+                selectedDate={selectedDate}
+                dayRecord={currentDayRecord}
+                onUpdateDay={handleUpdateDay}
               />
             </motion.div>
           )}
@@ -278,15 +298,22 @@ export default function App() {
           <div className="flex items-center gap-4">
             <button
               type="button"
+              onClick={() => setActiveTab('workout')}
+              className="hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors cursor-pointer"
+            >
+              Physical Training
+            </button>
+            <button
+              type="button"
               onClick={() => setActiveTab('telemetry')}
-              className="hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
+              className="hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors cursor-pointer"
             >
               Telemetry
             </button>
             <button
               type="button"
               onClick={() => setActiveTab('missions')}
-              className="hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
+              className="hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors cursor-pointer"
             >
               System
             </button>
@@ -314,7 +341,7 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => setShowResetConfirm(false)}
-                className="p-1 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
+                className="p-1 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -328,14 +355,14 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => setShowResetConfirm(false)}
-                className="px-4 py-2 rounded-lg text-xs font-semibold border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                className="px-4 py-2 rounded-lg text-xs font-semibold border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={handleConfirmReset}
-                className="px-4 py-2 rounded-lg text-xs font-semibold bg-rose-600 text-white hover:bg-rose-700 transition-colors shadow-xs"
+                className="px-4 py-2 rounded-lg text-xs font-semibold bg-rose-600 text-white hover:bg-rose-700 transition-colors shadow-xs cursor-pointer"
               >
                 Erase Everything
               </button>

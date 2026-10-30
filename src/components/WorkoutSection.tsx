@@ -3,7 +3,6 @@ import { DayRecord, WorkoutRoutine } from '../types';
 import { 
   WORKOUT_ROUTINES, 
   getWorkoutRoutineForDate, 
-  getPhase, 
   formatDisplayDate 
 } from '../utils/arcEngine';
 import { triggerHapticCompletion, triggerHapticRevert } from '../utils/haptics';
@@ -17,7 +16,7 @@ import {
   FileText, 
   ChevronDown,
   ChevronUp,
-  Flame
+  Sparkles
 } from 'lucide-react';
 
 interface WorkoutSectionProps {
@@ -31,13 +30,12 @@ export const WorkoutSection: React.FC<WorkoutSectionProps> = ({
   dayRecord,
   onUpdateDay,
 }) => {
-  const phase = getPhase(selectedDate);
   const scheduledRoutine = getWorkoutRoutineForDate(selectedDate);
   const { weekday, dateFormatted } = formatDisplayDate(selectedDate);
 
   const [activeRoutineKey, setActiveRoutineKey] = useState<string>(() => {
     const match = Object.entries(WORKOUT_ROUTINES).find(([_, r]) => r.id === scheduledRoutine.id);
-    return match ? match[0] : (phase === 'home' ? 'Push A' : 'Gym Session');
+    return match ? match[0] : 'Monday: Chest + Triceps + Core (A)';
   });
 
   useEffect(() => {
@@ -126,8 +124,8 @@ export const WorkoutSection: React.FC<WorkoutSectionProps> = ({
           <div>
             <div className="flex items-center gap-2">
               <span className="text-[10px] sm:text-[11px] font-mono uppercase tracking-widest text-zinc-500 dark:text-zinc-400 font-semibold flex items-center gap-1.5">
-                <Dumbbell className="w-3.5 h-3.5" />
-                Training Protocol
+                <Dumbbell className="w-3.5 h-3.5 text-emerald-500" />
+                Physical Training Protocol
               </span>
               <span className="text-zinc-300 dark:text-zinc-700">·</span>
               <span className="text-[10px] sm:text-[11px] font-mono text-zinc-500 dark:text-zinc-400">
@@ -138,7 +136,7 @@ export const WorkoutSection: React.FC<WorkoutSectionProps> = ({
               {currentRoutine.title}
             </h2>
             <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-              {currentRoutine.subtitle} · {phase === 'home' ? 'Foundation Phase' : 'Expansion Phase'}
+              {currentRoutine.subtitle}
             </p>
           </div>
 
@@ -155,7 +153,7 @@ export const WorkoutSection: React.FC<WorkoutSectionProps> = ({
                 workout: !prev.workout,
               }));
             }}
-            className={`min-h-[42px] px-4 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all shrink-0 active:scale-95 ${
+            className={`min-h-[42px] px-4 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all shrink-0 active:scale-95 cursor-pointer ${
               dayRecord.workout
                 ? 'bg-emerald-600 text-white shadow-xs'
                 : 'bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-200'
@@ -166,50 +164,55 @@ export const WorkoutSection: React.FC<WorkoutSectionProps> = ({
           </button>
         </div>
 
-        {/* Horizontal Routine Switcher (1-tap on mobile) */}
+        {/* Horizontal Routine Switcher */}
         <div className="pt-2 border-t border-zinc-100 dark:border-zinc-800/80">
           <div className="text-[10px] font-mono uppercase tracking-wider text-zinc-400 font-semibold mb-2">
-            Switch Split Protocol:
+            Weekly Split Schedule (Sunday Off):
           </div>
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
             {routineKeys.map((key) => {
               const isActive = activeRoutineKey === key;
+              const shortLabel = key.split(':')[0]; // e.g. Monday, Tuesday
               return (
                 <button
                   key={key}
                   type="button"
                   onClick={() => setActiveRoutineKey(key)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap transition-all select-none ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap transition-all select-none cursor-pointer ${
                     isActive
                       ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-950 font-semibold shadow-xs'
                       : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700'
                   }`}
+                  title={key}
                 >
-                  {key}
+                  {shortLabel}
                 </button>
               );
             })}
           </div>
         </div>
 
-        {/* Routine Progress line */}
+        {/* Routine Progress Bar */}
         {exercises.length > 0 ? (
           <div className="mt-4 pt-3 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between gap-3 text-xs font-mono">
             <span className="text-zinc-600 dark:text-zinc-400 font-medium">
-              Progress: {completedExercises} / {exercises.length} sets completed
+              Progress: {completedExercises} / {exercises.length} movements completed
             </span>
             <div className="w-32 sm:w-48 h-2 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
               <div
-                className="h-full bg-zinc-900 dark:bg-zinc-100 rounded-full transition-all duration-300"
+                className="h-full bg-emerald-500 rounded-full transition-all duration-300"
                 style={{ width: `${routineProgressPct}%` }}
               />
             </div>
           </div>
         ) : (
           <div className="mt-4 pt-3 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between text-xs font-mono text-emerald-600 dark:text-emerald-400 font-medium">
-            <span>Rest Protocol Active · Zero Workout Required</span>
+            <span className="flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5" />
+              Sunday Off Protocol Active · Zero Workout Required
+            </span>
             <span className="px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800">
-              Auto-Cleared
+              Rest Day
             </span>
           </div>
         )}
@@ -237,79 +240,78 @@ export const WorkoutSection: React.FC<WorkoutSectionProps> = ({
                   <CheckCircle2 className="w-5 h-5 stroke-[2.5]" />
                 </div>
                 <h4 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 font-mono">
-                  Complete Rest & Recovery Day
+                  Sunday Off · Complete Rest & Recovery Day
                 </h4>
                 <p className="text-xs text-zinc-600 dark:text-zinc-400 max-w-md mx-auto leading-relaxed">
-                  No lifting, conditioning, or step requirements prescribed for today. Allow muscles, central nervous system, and joints to fully adapt and recover.
+                  No lifting or intense physical training required today. Allow central nervous system, joints, and muscular tissue to fully adapt and restore.
                 </p>
               </div>
             ) : (
               exercises.map((ex, idx) => {
-              const isChecked = dayRecord.ex?.[idx] === true;
-              const isExpanded = expandedIndex === idx;
+                const isChecked = dayRecord.ex?.[idx] === true;
+                const isExpanded = expandedIndex === idx;
 
-              return (
-                <div
-                  key={ex.name}
-                  className={`p-3.5 sm:p-4 rounded-2xl border transition-all duration-150 ${
-                    isChecked
-                      ? 'bg-white dark:bg-zinc-900 border-emerald-300/80 dark:border-emerald-800/60 shadow-xs'
-                      : 'bg-white dark:bg-zinc-900 border-zinc-200/80 dark:border-zinc-800/80 hover:border-zinc-300 dark:hover:border-zinc-700'
-                  }`}
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div
-                      onClick={() => handleToggleExercise(idx)}
-                      className="flex items-start gap-3 flex-1 cursor-pointer select-none"
-                    >
-                      <div className={`mt-0.5 min-w-[24px] min-h-[24px] rounded-lg border flex items-center justify-center transition-colors ${
-                        isChecked
-                          ? 'bg-emerald-600 border-emerald-600 text-white'
-                          : 'border-zinc-300 dark:border-zinc-600 bg-zinc-50 dark:bg-zinc-800 text-transparent'
-                      }`}>
-                        <CheckCircle2 className="w-4 h-4 stroke-[2.5]" />
-                      </div>
-
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <h4 className={`text-xs sm:text-sm font-bold ${
-                            isChecked
-                              ? 'line-through text-zinc-400 dark:text-zinc-500'
-                              : 'text-zinc-900 dark:text-zinc-100'
-                          }`}>
-                            {ex.name}
-                          </h4>
-                          <span className="text-[11px] font-mono font-semibold px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
-                            {ex.setsReps}
-                          </span>
+                return (
+                  <div
+                    key={ex.name}
+                    className={`p-3.5 sm:p-4 rounded-2xl border transition-all duration-150 ${
+                      isChecked
+                        ? 'bg-white dark:bg-zinc-900 border-emerald-300/80 dark:border-emerald-800/60 shadow-xs'
+                        : 'bg-white dark:bg-zinc-900 border-zinc-200/80 dark:border-zinc-800/80 hover:border-zinc-300 dark:hover:border-zinc-700'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div
+                        onClick={() => handleToggleExercise(idx)}
+                        className="flex items-start gap-3 flex-1 cursor-pointer select-none"
+                      >
+                        <div className={`mt-0.5 min-w-[24px] min-h-[24px] rounded-lg border flex items-center justify-center transition-colors ${
+                          isChecked
+                            ? 'bg-emerald-600 border-emerald-600 text-white'
+                            : 'border-zinc-300 dark:border-zinc-600 bg-zinc-50 dark:bg-zinc-800 text-transparent'
+                        }`}>
+                          <CheckCircle2 className="w-4 h-4 stroke-[2.5]" />
                         </div>
 
-                        <div className="mt-1 text-[11px] text-zinc-500 dark:text-zinc-400">
-                          <span className="font-semibold text-zinc-700 dark:text-zinc-300">Focus:</span> {ex.target}
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h4 className={`text-xs sm:text-sm font-bold ${
+                              isChecked
+                                ? 'line-through text-zinc-400 dark:text-zinc-500'
+                                : 'text-zinc-900 dark:text-zinc-100'
+                            }`}>
+                              {ex.name}
+                            </h4>
+                            <span className="text-[11px] font-mono font-semibold px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
+                              {ex.setsReps}
+                            </span>
+                          </div>
+
+                          <div className="mt-1 text-[11px] text-zinc-500 dark:text-zinc-400">
+                            <span className="font-semibold text-zinc-700 dark:text-zinc-300">Target:</span> {ex.target}
+                          </div>
                         </div>
                       </div>
+
+                      <button
+                        type="button"
+                        onClick={() => setExpandedIndex(isExpanded ? null : idx)}
+                        className="p-1 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-400 transition-colors cursor-pointer"
+                        title="Toggle Form Cues"
+                      >
+                        {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                      </button>
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={() => setExpandedIndex(isExpanded ? null : idx)}
-                      className="p-1 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-400 transition-colors"
-                      title="Toggle Form Cues"
-                    >
-                      {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                    </button>
+                    {isExpanded && (
+                      <div className="mt-2.5 pt-2.5 border-t border-zinc-100 dark:border-zinc-800 text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed font-sans">
+                        <span className="font-semibold text-zinc-900 dark:text-zinc-200">Execution Standards:</span> {ex.cues}
+                      </div>
+                    )}
                   </div>
-
-                  {/* Expandable Form Cues */}
-                  {isExpanded && (
-                    <div className="mt-2.5 pt-2.5 border-t border-zinc-100 dark:border-zinc-800 text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed font-sans">
-                      <span className="font-semibold text-zinc-900 dark:text-zinc-200">Execution Standards:</span> {ex.cues}
-                    </div>
-                  )}
-                </div>
-              );
-            })
-          )}
+                );
+              })
+            )}
           </div>
 
           <div className="p-3.5 rounded-xl bg-zinc-100/70 dark:bg-zinc-800/40 border border-zinc-200/60 dark:border-zinc-800/60 text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
@@ -317,7 +319,7 @@ export const WorkoutSection: React.FC<WorkoutSectionProps> = ({
           </div>
         </div>
 
-        {/* Right Column: Mobile-friendly Rest Timer & Overload Notes */}
+        {/* Right Column: Rest Timer & Overload Notes */}
         <div className="space-y-4 sm:space-y-6">
           {/* Rest Timer */}
           <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 p-4 sm:p-5 shadow-xs">
@@ -351,7 +353,7 @@ export const WorkoutSection: React.FC<WorkoutSectionProps> = ({
                   key={sec}
                   type="button"
                   onClick={() => handleStartTimer(sec)}
-                  className={`text-xs py-2 font-mono font-semibold rounded-xl border transition-all active:scale-95 ${
+                  className={`text-xs py-2 font-mono font-semibold rounded-xl border transition-all active:scale-95 cursor-pointer ${
                     timerDuration === sec && !isRunning
                       ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 border-transparent'
                       : 'bg-zinc-50 dark:bg-zinc-800/60 text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-700'
@@ -366,7 +368,7 @@ export const WorkoutSection: React.FC<WorkoutSectionProps> = ({
               <button
                 type="button"
                 onClick={() => setIsRunning(!isRunning)}
-                className="flex-1 py-2.5 px-3 rounded-xl bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-semibold text-xs flex items-center justify-center gap-1.5 hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors active:scale-95"
+                className="flex-1 py-2.5 px-3 rounded-xl bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-semibold text-xs flex items-center justify-center gap-1.5 hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors active:scale-95 cursor-pointer"
               >
                 {isRunning ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
                 <span>{isRunning ? 'Pause Timer' : 'Start Timer'}</span>
@@ -377,7 +379,7 @@ export const WorkoutSection: React.FC<WorkoutSectionProps> = ({
                   setIsRunning(false);
                   setTimeLeft(timerDuration);
                 }}
-                className="p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors"
+                className="p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors cursor-pointer"
                 title="Reset Timer"
               >
                 <RotateCcw className="w-4 h-4" />
@@ -392,14 +394,14 @@ export const WorkoutSection: React.FC<WorkoutSectionProps> = ({
               Progressive Overload Log
             </span>
             <p className="mt-1 text-[11px] text-zinc-500 dark:text-zinc-400">
-              Track weights, reps achieved, backpack load, or exercise substitutions.
+              Track weights, reps achieved, dumbbell load, or adjustments.
             </p>
 
             <textarea
               rows={4}
               value={dayRecord.workoutNotes || ''}
               onChange={(e) => handleNotesChange(e.target.value)}
-              placeholder="e.g. Backpack with 10kg books for rows. Push-ups: 15, 14, 13 reps. Core plank held 50s."
+              placeholder="e.g. Bench press: 70kg × 8, 8, 7. Incline DB: 26kg × 10. Cable crossover: 15kg felt solid."
               className="mt-3 w-full text-xs font-mono p-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50/50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:outline-none focus:ring-1 focus:ring-zinc-900 dark:focus:ring-zinc-100 resize-y"
             />
           </div>

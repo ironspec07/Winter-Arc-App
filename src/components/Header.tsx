@@ -1,6 +1,6 @@
 import React from 'react';
 import { ActiveTab } from '../types';
-import { ChevronLeft, ChevronRight, Calendar, Sun, Moon, Download, CheckCircle2, BarChart3, ListTodo } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar, Sun, Moon, Download, CheckCircle2, BarChart3, ListTodo, Dumbbell } from 'lucide-react';
 import { formatDisplayDate } from '../utils/arcEngine';
 import { HabitatLogo } from './HabitatLogo';
 import { PWAInstallButton } from './PWAInstallButton';
@@ -41,6 +41,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   const navItems: { id: ActiveTab; label: string; icon: React.ReactNode }[] = [
     { id: 'overview', label: 'Daily Habits', icon: <CheckCircle2 className="w-4 h-4" /> },
+    { id: 'workout', label: 'Workout', icon: <Dumbbell className="w-4 h-4 text-orange-500" /> },
     { id: 'telemetry', label: 'Telemetry & Arc', icon: <BarChart3 className="w-4 h-4" /> },
     { id: 'missions', label: 'Missions & System', icon: <ListTodo className="w-4 h-4" /> },
   ];
@@ -65,7 +66,7 @@ export const Header: React.FC<HeaderProps> = ({
               <div className="flex items-center gap-1.5 text-[10px] sm:text-[11px] font-medium text-zinc-500 dark:text-zinc-400 truncate">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
                 <span className="truncate">
-                  Winter Arc Protocol · Oct 6 – Dec 31
+                  Winter Arc Protocol · Nov 1 – Dec 31
                 </span>
               </div>
             </div>
@@ -140,8 +141,8 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
 
-        {/* Desktop Tab Navigation (Hidden on mobile; mobile uses fixed bottom MobileNav) */}
-        <div className="hidden md:flex items-center space-x-1 overflow-x-auto py-1.5 border-t border-zinc-100 dark:border-zinc-900 scrollbar-none">
+        {/* Tab Navigation - Always visible */}
+        <div className="flex items-center space-x-1 overflow-x-auto py-1.5 border-t border-zinc-100 dark:border-zinc-900 scrollbar-none">
           {navItems.map((item) => {
             const isActive = activeTab === item.id;
             return (
@@ -149,7 +150,7 @@ export const Header: React.FC<HeaderProps> = ({
                 key={item.id}
                 type="button"
                 onClick={() => onTabChange(item.id)}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
+                className={`flex items-center gap-1.5 sm:gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap cursor-pointer ${
                   isActive
                     ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 shadow-xs'
                     : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-zinc-100/70 dark:hover:bg-zinc-800/70'

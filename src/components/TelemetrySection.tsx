@@ -30,7 +30,7 @@ interface TelemetrySectionProps {
   onSelectDate: (date: string) => void;
 }
 
-const ARC_MONTHS = ['2026-10', '2026-11', '2026-12'];
+const ARC_MONTHS = ['2026-11', '2026-12'];
 
 export const TelemetrySection: React.FC<TelemetrySectionProps> = ({
   state,
@@ -42,7 +42,7 @@ export const TelemetrySection: React.FC<TelemetrySectionProps> = ({
 
   const [activeMonth, setActiveMonth] = useState<string>(() => {
     const m = selectedDate.slice(0, 7);
-    return ARC_MONTHS.includes(m) ? m : '2026-10';
+    return ARC_MONTHS.includes(m) ? m : '2026-11';
   });
 
   const handlePrevMonth = () => {
@@ -101,141 +101,118 @@ export const TelemetrySection: React.FC<TelemetrySectionProps> = ({
   });
 
   return (
-    <div className="space-y-4 sm:space-y-6">
-      {/* Top Banner: Winter Arc Progression Timeline */}
-      <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 p-4 sm:p-6 shadow-xs">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] sm:text-[11px] font-mono uppercase tracking-widest text-zinc-500 dark:text-zinc-400 font-semibold flex items-center gap-1.5">
-                <TrendingUp className="w-3.5 h-3.5" />
-                Arc Telemetry
-              </span>
-              <span className="text-zinc-300 dark:text-zinc-700">·</span>
-              <span className="text-[10px] sm:text-[11px] font-mono text-zinc-500 dark:text-zinc-400">
-                06 Oct – 31 Dec 2026
-              </span>
+    <div className="space-y-6">
+      {/* 4 Primary Top Metric Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 p-4 sm:p-5 shadow-xs transition-colors">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-mono uppercase tracking-wider text-zinc-500 font-semibold">
+              Current Streak
+            </span>
+            <div className="p-2 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400">
+              <Flame className="w-4 h-4 fill-amber-500 text-amber-500" />
             </div>
-            <h2 className="mt-1 text-2xl sm:text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-50 font-mono">
-              Day {stats.daysElapsed} of {stats.totalDaysInArc}
-            </h2>
-            <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
-              {stats.daysRemaining} days remaining in the 2026 discipline protocol.
-            </p>
           </div>
-
-          <div className="flex items-center gap-3 sm:gap-4 font-mono pt-1 sm:pt-0">
-            <div className="sm:text-right">
-              <div className="text-[11px] text-zinc-500 dark:text-zinc-400">Campaign Completion</div>
-              <div className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
-                {Math.round((stats.daysElapsed / stats.totalDaysInArc) * 100)}%
-              </div>
-            </div>
+          <div className="mt-3 flex items-baseline gap-2">
+            <span className="text-3xl sm:text-4xl font-extrabold font-mono text-zinc-900 dark:text-zinc-100">
+              {stats.currentStreak}
+            </span>
+            <span className="text-xs font-mono text-zinc-500">consecutive days</span>
+          </div>
+          <div className="mt-2 text-[11px] text-zinc-500 font-mono">
+            {stats.currentStreak > 0 ? 'Protocol maintained' : 'Threshold is ≥4/5 habits'}
           </div>
         </div>
 
-        {/* Linear progress bar */}
-        <div className="mt-4">
-          <div className="h-2 w-full bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden relative">
-            <div
-              className="h-full bg-zinc-900 dark:bg-zinc-100 rounded-full transition-all duration-300"
-              style={{ width: `${Math.round((stats.daysElapsed / stats.totalDaysInArc) * 100)}%` }}
-            />
+        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 p-4 sm:p-5 shadow-xs transition-colors">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-mono uppercase tracking-wider text-zinc-500 font-semibold">
+              Best Streak
+            </span>
+            <div className="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400">
+              <Trophy className="w-4 h-4 text-emerald-500" />
+            </div>
           </div>
-          <div className="flex justify-between items-center text-[9px] sm:text-[10px] font-mono text-zinc-400 dark:text-zinc-500 mt-1.5">
-            <span>Oct 6 (Start)</span>
-            <span>Nov 15 (Midpoint)</span>
-            <span>Dec 31 (Finish)</span>
+          <div className="mt-3 flex items-baseline gap-2">
+            <span className="text-3xl sm:text-4xl font-extrabold font-mono text-zinc-900 dark:text-zinc-100">
+              {stats.bestStreak}
+            </span>
+            <span className="text-xs font-mono text-zinc-500">record days</span>
+          </div>
+          <div className="mt-2 text-[11px] text-zinc-500 font-mono">
+            All-time Winter Arc maximum
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 p-4 sm:p-5 shadow-xs transition-colors">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-mono uppercase tracking-wider text-zinc-500 font-semibold">
+              Discipline Days
+            </span>
+            <div className="p-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400">
+              <Target className="w-4 h-4 text-indigo-500" />
+            </div>
+          </div>
+          <div className="mt-3 flex items-baseline gap-2">
+            <span className="text-3xl sm:text-4xl font-extrabold font-mono text-zinc-900 dark:text-zinc-100">
+              {stats.totalCompletedDays}
+            </span>
+            <span className="text-xs font-mono text-zinc-500">of {stats.daysElapsed}</span>
+          </div>
+          <div className="mt-2 text-[11px] text-zinc-500 font-mono">
+            {stats.daysElapsed > 0 ? Math.round((stats.totalCompletedDays / stats.daysElapsed) * 100) : 0}% campaign consistency
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 p-4 sm:p-5 shadow-xs transition-colors">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-mono uppercase tracking-wider text-zinc-500 font-semibold">
+              Protocol Compliance
+            </span>
+            <div className="p-2 rounded-xl bg-cyan-50 dark:bg-cyan-950/40 text-cyan-600 dark:text-cyan-400">
+              <Percent className="w-4 h-4 text-cyan-500" />
+            </div>
+          </div>
+          <div className="mt-3 flex items-baseline gap-2">
+            <span className="text-3xl sm:text-4xl font-extrabold font-mono text-zinc-900 dark:text-zinc-100">
+              {stats.overallConsistency}%
+            </span>
+            <span className="text-xs font-mono text-zinc-500">arc volume</span>
+          </div>
+          <div className="mt-2 text-[11px] text-zinc-500 font-mono">
+            Aggregate execution index
           </div>
         </div>
       </div>
 
-      {/* 4 Core Telemetry Metric Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3.5">
-        <div className="p-3.5 sm:p-4 rounded-xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-zinc-900 shadow-xs">
-          <div className="flex items-center justify-between text-zinc-500 dark:text-zinc-400">
-            <span className="text-[10px] sm:text-[11px] font-mono uppercase tracking-wider font-semibold">Active Streak</span>
-            <Flame className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-500" />
-          </div>
-          <div className="mt-1.5 text-2xl sm:text-3xl font-extrabold font-mono text-zinc-900 dark:text-zinc-100">
-            {stats.currentStreak} <span className="text-xs font-normal text-zinc-500">days</span>
-          </div>
-          <p className="mt-0.5 text-[10px] sm:text-[11px] text-zinc-500 dark:text-zinc-400 truncate">
-            Days ≥ {DISCIPLINE_THRESHOLD}/{TOTAL_HABITS} habits
-          </p>
-        </div>
+      {/* Trailing 7-Day Completion Rate Bar Chart */}
+      <SevenDayHabitBarChart state={state} selectedDate={selectedDate} />
 
-        <div className="p-3.5 sm:p-4 rounded-xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-zinc-900 shadow-xs">
-          <div className="flex items-center justify-between text-zinc-500 dark:text-zinc-400">
-            <span className="text-[10px] sm:text-[11px] font-mono uppercase tracking-wider font-semibold">Best Streak</span>
-            <Trophy className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-yellow-500" />
-          </div>
-          <div className="mt-1.5 text-2xl sm:text-3xl font-extrabold font-mono text-zinc-900 dark:text-zinc-100">
-            {stats.bestStreak} <span className="text-xs font-normal text-zinc-500">days</span>
-          </div>
-          <p className="mt-0.5 text-[10px] sm:text-[11px] text-zinc-500 dark:text-zinc-400 truncate">
-            Longest discipline run
-          </p>
-        </div>
-
-        <div className="p-3.5 sm:p-4 rounded-xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-zinc-900 shadow-xs">
-          <div className="flex items-center justify-between text-zinc-500 dark:text-zinc-400">
-            <span className="text-[10px] sm:text-[11px] font-mono uppercase tracking-wider font-semibold">Elite Days</span>
-            <Target className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-500" />
-          </div>
-          <div className="mt-1.5 text-2xl sm:text-3xl font-extrabold font-mono text-zinc-900 dark:text-zinc-100">
-            {stats.totalCompletedDays} <span className="text-xs font-normal text-zinc-500">days</span>
-          </div>
-          <p className="mt-0.5 text-[10px] sm:text-[11px] text-zinc-500 dark:text-zinc-400 truncate">
-            High-compliance days
-          </p>
-        </div>
-
-        <div className="p-3.5 sm:p-4 rounded-xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-zinc-900 shadow-xs">
-          <div className="flex items-center justify-between text-zinc-500 dark:text-zinc-400">
-            <span className="text-[10px] sm:text-[11px] font-mono uppercase tracking-wider font-semibold">Consistency</span>
-            <Percent className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-sky-500" />
-          </div>
-          <div className="mt-1.5 text-2xl sm:text-3xl font-extrabold font-mono text-zinc-900 dark:text-zinc-100">
-            {stats.overallConsistency}%
-          </div>
-          <p className="mt-0.5 text-[10px] sm:text-[11px] text-zinc-500 dark:text-zinc-400 truncate">
-            Overall execution rate
-          </p>
-        </div>
-      </div>
-
-      {/* 7-Day Core Habits Completion Bar Chart */}
-      <SevenDayHabitBarChart
-        state={state}
-        selectedDate={selectedDate}
-      />
-
-      {/* 30-Day Habit Completion Trends Recharts Line Chart */}
+      {/* Interactive 30-Day Completion Trend Chart */}
       <HabitTrendChart
         state={state}
         selectedDate={selectedDate}
         onSelectDate={onSelectDate}
       />
 
-      {/* Main Grid: Interactive Calendar & Monthly Cards */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-        {/* Left 2 Cols: Monthly Interactive Calendar Matrix */}
-        <div className="lg:col-span-2 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 p-3.5 sm:p-6 shadow-xs">
-          <div className="flex items-center justify-between mb-3 sm:mb-4">
+      {/* Monthly Interactive Arc Matrix & Habit Breakdown Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left 2 Cols: Monthly Matrix Calendar */}
+        <div className="lg:col-span-2 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 p-4 sm:p-6 shadow-xs">
+          <div className="flex items-center justify-between pb-4 border-b border-zinc-100 dark:border-zinc-800 mb-4">
             <div className="flex items-center gap-2">
               <CalendarIcon className="w-4 h-4 text-zinc-500" />
-              <h3 className="text-xs sm:text-sm font-bold font-mono text-zinc-900 dark:text-zinc-100">
+              <h2 className="text-base sm:text-lg font-bold font-mono text-zinc-900 dark:text-zinc-100">
                 {monthLabel}
-              </h3>
+              </h2>
             </div>
 
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1.5">
               <button
                 type="button"
                 onClick={handlePrevMonth}
                 disabled={activeMonth === ARC_MONTHS[0]}
-                className="p-1 sm:p-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors"
+                className="p-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 disabled:opacity-30 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                 title="Previous Month"
               >
                 <ChevronLeft className="w-4 h-4" />
@@ -244,7 +221,7 @@ export const TelemetrySection: React.FC<TelemetrySectionProps> = ({
                 type="button"
                 onClick={handleNextMonth}
                 disabled={activeMonth === ARC_MONTHS[ARC_MONTHS.length - 1]}
-                className="p-1 sm:p-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors"
+                className="p-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 disabled:opacity-30 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                 title="Next Month"
               >
                 <ChevronRight className="w-4 h-4" />
@@ -295,7 +272,7 @@ export const TelemetrySection: React.FC<TelemetrySectionProps> = ({
                   key={dateIso}
                   type="button"
                   onClick={() => onSelectDate(dateIso)}
-                  className={`min-h-[46px] sm:min-h-[60px] p-1.5 sm:p-2 rounded-xl border text-left flex flex-col justify-between transition-all select-none relative active:scale-95 ${statusColor} ${
+                  className={`min-h-[46px] sm:min-h-[60px] p-1.5 sm:p-2 rounded-xl border text-left flex flex-col justify-between transition-all select-none relative active:scale-95 cursor-pointer ${statusColor} ${
                     isSelected
                       ? 'ring-2 ring-zinc-900 dark:ring-zinc-100 shadow-sm z-10'
                       : 'hover:border-zinc-400 dark:hover:border-zinc-600'
@@ -331,11 +308,11 @@ export const TelemetrySection: React.FC<TelemetrySectionProps> = ({
             <div className="flex items-center gap-3 sm:gap-4">
               <span className="flex items-center gap-1.5">
                 <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-xs sm:rounded-sm bg-emerald-400 dark:bg-emerald-600" />
-                6–7 Protocols
+                4–5 Protocols (Discipline Met)
               </span>
               <span className="flex items-center gap-1.5">
                 <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-xs sm:rounded-sm bg-amber-400 dark:bg-amber-600" />
-                4–5 Protocols
+                3 Protocols (Baseline)
               </span>
             </div>
             <span className="hidden sm:inline text-zinc-400">Tap day to inspect</span>
@@ -344,70 +321,59 @@ export const TelemetrySection: React.FC<TelemetrySectionProps> = ({
 
         {/* Right Col: Monthly Summaries & Habit Breakdown */}
         <div className="space-y-4 sm:space-y-6">
-          {/* 3 Month Performance Cards */}
+          {/* 2 Month Performance Cards */}
           <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 p-4 sm:p-5 shadow-xs">
             <h3 className="text-xs font-bold uppercase tracking-wider font-mono text-zinc-500 dark:text-zinc-400 mb-3">
               Monthly Campaign Blocks
             </h3>
-
-            <div className="space-y-2 sm:space-y-2.5">
-              {monthlySummaries.map((m) => {
-                const isActive = activeMonth === m.monthStr;
-                return (
-                  <div
-                    key={m.monthStr}
-                    onClick={() => setActiveMonth(m.monthStr)}
-                    className={`p-2.5 sm:p-3 rounded-xl border transition-all cursor-pointer ${
-                      isActive
-                        ? 'bg-zinc-50 dark:bg-zinc-800/60 border-zinc-300 dark:border-zinc-700'
-                        : 'border-zinc-200/70 dark:border-zinc-800/70 hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="font-mono font-bold text-xs text-zinc-900 dark:text-zinc-100">
-                        {m.label} 2026
-                      </span>
-                      <span className="text-xs font-mono font-semibold text-zinc-700 dark:text-zinc-300">
-                        {m.avgScorePct}% Rate
-                      </span>
+            <div className="space-y-2.5">
+              {monthlySummaries.map((m) => (
+                <div
+                  key={m.monthStr}
+                  onClick={() => setActiveMonth(m.monthStr)}
+                  className={`p-3 rounded-xl border transition-all cursor-pointer flex items-center justify-between ${
+                    activeMonth === m.monthStr
+                      ? 'border-zinc-900 dark:border-zinc-100 bg-zinc-50 dark:bg-zinc-800/80'
+                      : 'border-zinc-200/70 dark:border-zinc-800/70 hover:border-zinc-300 dark:hover:border-zinc-700'
+                  }`}
+                >
+                  <div>
+                    <div className="text-xs font-bold font-mono text-zinc-900 dark:text-zinc-100">
+                      {m.label} 2026
                     </div>
-
-                    <div className="mt-1 flex items-center justify-between text-[10px] text-zinc-500 font-mono">
-                      <span>{m.trackedDays} / {m.eligibleDays} days logged</span>
-                      <span>{m.eligibleDays} days</span>
-                    </div>
-
-                    <div className="mt-1.5 h-1.5 w-full bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-zinc-900 dark:bg-zinc-100 rounded-full"
-                        style={{ width: `${m.avgScorePct}%` }}
-                      />
+                    <div className="text-[10px] font-mono text-zinc-500 mt-0.5">
+                      {m.eligibleDays} days in arc
                     </div>
                   </div>
-                );
-              })}
+                  <div className="text-right">
+                    <div className="text-sm font-extrabold font-mono text-zinc-900 dark:text-zinc-100">
+                      {m.avgScorePct}%
+                    </div>
+                    <div className="text-[10px] font-mono text-zinc-400">
+                      compliance
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* Habit compliance list */}
+          {/* Habit-by-Habit Arc Volume Breakdown */}
           <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 p-4 sm:p-5 shadow-xs">
             <h3 className="text-xs font-bold uppercase tracking-wider font-mono text-zinc-500 dark:text-zinc-400 mb-3">
-              Protocol Compliance Rate
+              Habit Execution Consistency
             </h3>
-
-            <div className="space-y-2">
-              {habitCompliance.map((item) => (
-                <div key={item.key}>
-                  <div className="flex items-center justify-between text-[11px] sm:text-xs mb-0.5">
-                    <span className="font-medium text-zinc-700 dark:text-zinc-300">{item.label}</span>
-                    <span className="font-mono text-zinc-500">{item.rate}%</span>
+            <div className="space-y-3">
+              {habitCompliance.map((h) => (
+                <div key={h.key} className="space-y-1">
+                  <div className="flex justify-between text-xs font-mono">
+                    <span className="text-zinc-700 dark:text-zinc-300 font-medium">{h.label}</span>
+                    <span className="text-zinc-900 dark:text-zinc-100 font-bold">{h.rate}%</span>
                   </div>
                   <div className="h-1.5 w-full bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
                     <div
-                      className={`h-full rounded-full ${
-                        item.rate >= 80 ? 'bg-emerald-500' : item.rate >= 50 ? 'bg-zinc-700 dark:bg-zinc-300' : 'bg-zinc-400 dark:bg-zinc-600'
-                      }`}
-                      style={{ width: `${item.rate}%` }}
+                      className="h-full bg-zinc-900 dark:bg-zinc-100 rounded-full"
+                      style={{ width: `${h.rate}%` }}
                     />
                   </div>
                 </div>

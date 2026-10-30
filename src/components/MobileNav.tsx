@@ -1,6 +1,6 @@
 import React from 'react';
 import { ActiveTab } from '../types';
-import { CheckCircle2, BarChart3, ListTodo } from 'lucide-react';
+import { CheckCircle2, Dumbbell, BarChart3, ListTodo } from 'lucide-react';
 import { triggerHapticTap } from '../utils/haptics';
 import { TOTAL_HABITS } from '../utils/arcEngine';
 
@@ -25,6 +25,11 @@ export const MobileNav: React.FC<MobileNavProps> = ({
       badge: `${completedCount}/${TOTAL_HABITS}`,
     },
     {
+      id: 'workout',
+      label: 'Workout',
+      icon: <Dumbbell className="w-5 h-5 text-orange-500" />,
+    },
+    {
       id: 'telemetry',
       label: 'Telemetry',
       icon: <BarChart3 className="w-5 h-5" />,
@@ -42,7 +47,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
       aria-label="Mobile Navigation"
       className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-xl border-t border-zinc-200/90 dark:border-zinc-800/90 px-2 py-1.5 pb-[calc(0.4rem+env(safe-area-inset-bottom))] shadow-lg transition-colors"
     >
-      <div className="grid grid-cols-3 gap-1 max-w-md mx-auto">
+      <div className="grid grid-cols-4 gap-1 max-w-md mx-auto">
         {items.map((item) => {
           const isActive = activeTab === item.id;
           return (
@@ -53,7 +58,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
                 triggerHapticTap(8);
                 onTabChange(item.id);
               }}
-              className={`flex flex-col items-center justify-center py-2 px-1 rounded-xl transition-all duration-150 relative select-none active:scale-95 ${
+              className={`flex flex-col items-center justify-center py-2 px-1 rounded-xl transition-all duration-150 relative select-none active:scale-95 cursor-pointer ${
                 isActive
                   ? 'text-zinc-950 dark:text-zinc-50 font-semibold'
                   : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200'
@@ -61,7 +66,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
             >
               {/* Active Indicator bar */}
               {isActive && (
-                <span className="absolute top-0.5 w-7 h-1 rounded-full bg-zinc-900 dark:bg-zinc-100 transition-all" />
+                <span className="absolute top-0.5 w-6 h-1 rounded-full bg-zinc-900 dark:bg-zinc-100 transition-all" />
               )}
 
               <div className="relative mt-0.5">

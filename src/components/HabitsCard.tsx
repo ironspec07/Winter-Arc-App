@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { AppState, DayRecord, HabitKey, StreakStats } from '../types';
 import { StreakSummaryCard } from './StreakSummaryCard';
-import { WeeklyInsightsCard } from './WeeklyInsightsCard';
 import { PastSevenDaysSummaryCard } from './PastSevenDaysSummaryCard';
 import { triggerCompletionConfetti } from '../utils/confetti';
 import { 
@@ -15,14 +14,13 @@ import {
   getDayTargets, 
   isHabitComplete, 
   getCompletedHabitCount, 
-  TOTAL_HABITS
+  TOTAL_HABITS,
+  getWorkoutRoutineForDate
 } from '../utils/arcEngine';
 import { 
   Footprints, 
   BrainCircuit, 
-  Droplet, 
   Briefcase, 
-  Sparkles, 
   ShieldCheck, 
   Dumbbell, 
   Check, 
@@ -31,7 +29,8 @@ import {
   Flame,
   Zap,
   CheckCircle2,
-  Award
+  Award,
+  ArrowRight
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -42,26 +41,23 @@ interface HabitsCardProps {
   onUpdateDay: (updater: (prev: DayRecord) => DayRecord) => void;
   onSelectDate: (date: string) => void;
   streakStats: StreakStats;
+  onNavigateToWorkout?: () => void;
 }
 
 const HABIT_ICONS: Record<HabitKey, React.ReactNode> = {
   steps: <Footprints className="w-4 h-4 text-emerald-500" />,
-  study: <BrainCircuit className="w-4 h-4 text-indigo-500" />,
-  jobs: <Briefcase className="w-4 h-4 text-amber-500" />,
-  workout: <Dumbbell className="w-4 h-4 text-orange-500" />,
   discipline: <ShieldCheck className="w-4 h-4 text-rose-500" />,
-  water: <Droplet className="w-4 h-4 text-cyan-500" />,
-  hygiene: <Sparkles className="w-4 h-4 text-teal-500" />,
+  study: <BrainCircuit className="w-4 h-4 text-indigo-500" />,
+  workout: <Dumbbell className="w-4 h-4 text-orange-500" />,
+  jobs: <Briefcase className="w-4 h-4 text-amber-500" />,
 };
 
 const QUICK_INCREMENTS: Record<HabitKey, number[]> = {
   steps: [1000, 2500],
-  study: [0.5, 1],
-  jobs: [1, 2],
-  workout: [],
   discipline: [],
-  water: [0.5, 1],
-  hygiene: [],
+  study: [0.5, 1],
+  workout: [],
+  jobs: [1, 2],
 };
 
 type FilterCategory = 'All' | 'Physical' | 'Intellectual' | 'Discipline';
@@ -73,32 +69,34 @@ export const HabitsCard: React.FC<HabitsCardProps> = ({
   onUpdateDay,
   onSelectDate,
   streakStats,
+  onNavigateToWorkout,
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<FilterCategory>('All');
 
   const targets = getDayTargets(selectedDate);
   const completedCount = getCompletedHabitCount(dayRecord, selectedDate);
   const percentage = Math.round((completedCount / TOTAL_HABITS) * 100);
+  const todaysRoutine = getWorkoutRoutineForDate(selectedDate);
 
-  // Immediate performance feedback loop status
+  // Performance feedback loop based on 5 habits
   const getFeedbackDetails = (pct: number, count: number) => {
     if (pct === 100) {
       return {
         badge: 'Elite Execution',
         badgeColor: 'bg-emerald-500 text-white shadow-xs',
-        message: 'All 7 standards achieved with full compliance. Uncompromised discipline.',
+        message: 'All 5 core standards achieved with full compliance. Uncompromised discipline.',
         icon: <Award className="w-3.5 h-3.5" />,
       };
     }
-    if (count >= 6) { // 6/7 habits
+    if (count >= 4) { // 4/5 habits
       return {
         badge: 'Discipline Threshold Met',
         badgeColor: 'bg-emerald-100 text-emerald-900 dark:bg-emerald-950/70 dark:text-emerald-300 border border-emerald-300/80 dark:border-emerald-800',
-        message: `${TOTAL_HABITS - count} habit remaining to lock in an elite 7/7 day.`,
+        message: `${TOTAL_HABITS - count} habit remaining to lock in an elite 5/5 day.`,
         icon: <Zap className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />,
       };
     }
-    if (count >= 4) { // 4/7 habits
+    if (count >= 3) { // 3/5 habits
       return {
         badge: 'Baseline Standard Active',
         badgeColor: 'bg-amber-100 text-amber-900 dark:bg-amber-950/70 dark:text-amber-300 border border-amber-300/80 dark:border-amber-800',
@@ -117,7 +115,7 @@ export const HabitsCard: React.FC<HabitsCardProps> = ({
     return {
       badge: 'Uninitiated',
       badgeColor: 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800/80 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700',
-      message: 'Start today by checking off morning hydration, study, or your step baseline.',
+      message: 'Start today by checking off study, your step baseline, or dopamine discipline.',
       icon: <CheckCircle2 className="w-3.5 h-3.5 text-zinc-400" />,
     };
   };
@@ -127,7 +125,7 @@ export const HabitsCard: React.FC<HabitsCardProps> = ({
   // Find next pending habit
   const nextPending = HABIT_DEFINITIONS.find(def => !isHabitComplete(def.key, dayRecord, selectedDate));
 
-  // Auto-trigger celebratory confetti and ripple when all 6 habits are completed
+  // Auto-trigger celebratory confetti when all 5 habits are completed
   const prevCountRef = useRef<number>(completedCount);
   const prevDateRef = useRef<string>(selectedDate);
 
@@ -232,7 +230,7 @@ export const HabitsCard: React.FC<HabitsCardProps> = ({
               </span>
               <span className="text-zinc-300 dark:text-zinc-700">·</span>
               <span className="text-[10px] sm:text-[11px] font-mono text-zinc-500 dark:text-zinc-400">
-                7 Core Habits Protocol
+                5 Core Habits Protocol
               </span>
             </div>
 
@@ -316,17 +314,11 @@ export const HabitsCard: React.FC<HabitsCardProps> = ({
               title="Click to celebrate again!"
             >
               <div className="flex items-center gap-3">
-                {/* Concentric ripple wave circles around checkmark */}
                 <div className="relative flex items-center justify-center w-8 h-8 shrink-0">
                   <motion.div
                     animate={{ scale: [1, 1.8, 2.5], opacity: [0.55, 0.2, 0] }}
                     transition={{ duration: 2.2, repeat: Infinity, ease: 'easeOut' }}
                     className="absolute inset-0 rounded-full bg-emerald-500/35 dark:bg-emerald-400/30 pointer-events-none"
-                  />
-                  <motion.div
-                    animate={{ scale: [1, 1.45, 1.9], opacity: [0.65, 0.25, 0] }}
-                    transition={{ duration: 2.2, repeat: Infinity, delay: 0.7, ease: 'easeOut' }}
-                    className="absolute inset-0 rounded-full bg-emerald-500/25 dark:bg-emerald-400/20 pointer-events-none"
                   />
                   <div className="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center relative z-10 shadow-xs shadow-emerald-500/40 group-hover:scale-105 transition-transform">
                     <Check className="w-4 h-4 stroke-[3]" />
@@ -336,10 +328,9 @@ export const HabitsCard: React.FC<HabitsCardProps> = ({
                 <div>
                   <div className="text-xs font-bold text-emerald-900 dark:text-emerald-200 flex items-center gap-1.5">
                     <span>Target Cleared</span>
-                    <Sparkles className="w-3.5 h-3.5 text-amber-500 animate-pulse" />
                   </div>
                   <div className="text-[10px] text-emerald-700 dark:text-emerald-400 font-mono">
-                    All 7 standards achieved (100%)
+                    All 5 standards achieved (100%)
                   </div>
                 </div>
               </div>
@@ -362,9 +353,9 @@ export const HabitsCard: React.FC<HabitsCardProps> = ({
               className={`h-full rounded-full relative ${
                 percentage === 100
                   ? 'bg-emerald-500 shadow-sm shadow-emerald-500/50'
-                  : completedCount >= 6
-                  ? 'bg-emerald-600 dark:bg-emerald-500'
                   : completedCount >= 4
+                  ? 'bg-emerald-600 dark:bg-emerald-500'
+                  : completedCount >= 3
                   ? 'bg-zinc-800 dark:bg-zinc-200'
                   : 'bg-zinc-900 dark:bg-zinc-100'
               }`}
@@ -374,63 +365,26 @@ export const HabitsCard: React.FC<HabitsCardProps> = ({
               )}
             </motion.div>
 
-            {/* Threshold Ticks */}
+            {/* Threshold Ticks for 5 habits (60% baseline, 80% discipline) */}
             <div className="absolute inset-0 pointer-events-none flex justify-between px-[1px]">
-              <span className="w-0.5 h-full bg-zinc-300/40 dark:bg-zinc-700/60" style={{ left: '57.1%' }} />
-              <span className="w-0.5 h-full bg-zinc-300/40 dark:bg-zinc-700/60" style={{ left: '85.7%' }} />
+              <span className="w-0.5 h-full bg-zinc-300/40 dark:bg-zinc-700/60" style={{ left: '60%' }} />
+              <span className="w-0.5 h-full bg-zinc-300/40 dark:bg-zinc-700/60" style={{ left: '80%' }} />
             </div>
           </div>
 
-          {/* Performance Loop Legend */}
-          <div className="flex justify-between items-center text-[9px] sm:text-[10px] font-mono text-zinc-400 dark:text-zinc-500 mt-1.5 px-0.5">
-            <span>0% Start</span>
-            <span className={completedCount >= 4 ? 'text-zinc-700 dark:text-zinc-300 font-semibold' : ''}>
-              57% Baseline (4)
-            </span>
-            <span className={completedCount >= 6 ? 'text-emerald-600 dark:text-emerald-400 font-semibold' : ''}>
-              86% Threshold (6)
-            </span>
+          {/* Micro-labels beneath progress bar */}
+          <div className="flex items-center justify-between text-[9px] sm:text-[10px] font-mono text-zinc-400 dark:text-zinc-500 mt-1.5 px-0.5">
+            <span>0%</span>
+            <span className="text-amber-600 dark:text-amber-400 font-semibold">Baseline: 3 Habits (60%)</span>
+            <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Threshold: 4 Habits (80%)</span>
             <span className={percentage === 100 ? 'text-emerald-600 dark:text-emerald-400 font-bold' : ''}>
-              100% Elite (7)
+              100% Elite
             </span>
           </div>
         </div>
       </motion.div>
 
-      {/* Weekly Insights Automated Telemetry Summary */}
-      <WeeklyInsightsCard
-        state={state}
-        selectedDate={selectedDate}
-        onSelectDate={onSelectDate}
-      />
-
-      {/* Category Filter Pills with Tap Animation */}
-      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none px-0.5">
-        {categories.map((cat) => {
-          const count = cat === 'All' 
-            ? HABIT_DEFINITIONS.length 
-            : HABIT_DEFINITIONS.filter(d => d.category === cat).length;
-          const isCatActive = selectedCategory === cat;
-
-          return (
-            <motion.button
-              key={cat}
-              whileTap={{ scale: 0.95 }}
-              type="button"
-              onClick={() => setSelectedCategory(cat)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap transition-all select-none cursor-pointer ${
-                isCatActive
-                  ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-950 font-semibold shadow-xs'
-                  : 'bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 border border-zinc-200/70 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700'
-              }`}
-            >
-              {cat} ({count})
-            </motion.button>
-          );
-        })}
-      </div>
-
-      {/* Past 7 Days Summary Card for Selected Habits */}
+      {/* Trailing 7-Day Performance & Trends Summary Card */}
       <PastSevenDaysSummaryCard
         state={state}
         selectedDate={selectedDate}
@@ -439,7 +393,52 @@ export const HabitsCard: React.FC<HabitsCardProps> = ({
         onSelectDate={onSelectDate}
       />
 
-      {/* HABITS LIST (WITH STAGGERED FLUID FRAMER MOTION TRANSITIONS) */}
+
+      {/* FILTER BUTTONS & QUICK BULK ACTIONS */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-1">
+        <div className="flex items-center gap-1 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              type="button"
+              onClick={() => setSelectedCategory(cat)}
+              className={`px-3 py-1.5 rounded-xl text-xs font-mono font-medium transition-colors shrink-0 cursor-pointer ${
+                selectedCategory === cat
+                  ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 shadow-xs'
+                  : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+
+        {/* One-tap clear/complete controls */}
+        <div className="flex items-center gap-2 self-end sm:self-auto">
+          <button
+            type="button"
+            onClick={() => {
+              onUpdateDay(() => ({
+                steps: targets.steps,
+                study: targets.study,
+                jobs: targets.jobs,
+                workout: true,
+                discipline: true,
+                ex: {},
+                workoutNotes: '',
+              }));
+              triggerCompletionConfetti();
+              triggerHapticGrandCelebration();
+            }}
+            className="text-[11px] font-mono text-zinc-600 dark:text-zinc-400 hover:text-emerald-600 dark:hover:text-emerald-400 px-2 py-1 rounded-lg border border-zinc-200 dark:border-zinc-800 hover:border-emerald-300 dark:hover:border-emerald-700 transition-colors flex items-center gap-1 cursor-pointer"
+          >
+            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+            <span>Check All Targets</span>
+          </button>
+        </div>
+      </div>
+
+      {/* HABITS LIST (5 CORE HABITS) */}
       <div className="space-y-2.5 sm:space-y-3 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-3 md:space-y-0">
         <AnimatePresence mode="popLayout">
           {filteredHabits.map((def, idx) => {
@@ -517,22 +516,43 @@ export const HabitsCard: React.FC<HabitsCardProps> = ({
                   <p className="mt-1.5 text-[11px] text-zinc-500 dark:text-zinc-400 line-clamp-1">
                     {def.description}
                   </p>
+
+                  {/* Special workout routine helper banner */}
+                  {def.key === 'workout' && onNavigateToWorkout && (
+                    <div className="mt-2 p-2 rounded-xl bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/70 dark:border-zinc-700/60 flex items-center justify-between gap-2">
+                      <div className="min-w-0">
+                        <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-wider block">
+                          Routine Split
+                        </span>
+                        <span className="text-xs font-semibold text-zinc-800 dark:text-zinc-200 truncate block">
+                          {todaysRoutine.type === 'rest' ? 'Sunday Rest & Recovery' : todaysRoutine.title}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={onNavigateToWorkout}
+                        className="text-[11px] font-mono font-semibold px-2 py-1 rounded-lg bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors flex items-center gap-1 shrink-0 cursor-pointer"
+                      >
+                        <span>Open</span>
+                        <ArrowRight className="w-3 h-3" />
+                      </button>
+                    </div>
+                  )}
                 </div>
 
-                {/* Controls Footer */}
-                <div className="mt-3 pt-2.5 border-t border-zinc-100 dark:border-zinc-800/70">
+                {/* Input / Step Controls */}
+                <div className="mt-3 pt-3 border-t border-zinc-100 dark:border-zinc-800/80">
                   {def.type === 'number' ? (
                     <div className="space-y-2">
-                      {/* Steppers + Quick Presets + Direct Input */}
-                      <div className="flex items-center justify-between gap-1.5 flex-wrap">
-                        {/* Plus / Minus Steppers */}
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        {/* - / + Step Buttons */}
                         <div className="flex items-center gap-1">
                           <motion.button
                             whileTap={{ scale: 0.9 }}
                             type="button"
                             onClick={() => handleStep(def.key as keyof DayRecord, -def.step)}
                             className="min-w-[36px] min-h-[36px] rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 flex items-center justify-center text-zinc-700 dark:text-zinc-300 transition-colors cursor-pointer"
-                            title={`Subtract ${def.step}`}
+                            title={`Minus ${def.step}`}
                           >
                             <Minus className="w-3.5 h-3.5" />
                           </motion.button>
@@ -594,7 +614,7 @@ export const HabitsCard: React.FC<HabitsCardProps> = ({
                       </div>
                     </div>
                   ) : (
-                    /* Boolean Checkbox Controls (Big touch target for mobile) */
+                    /* Boolean Checkbox Controls */
                     <div className="flex items-center justify-between gap-2">
                       <span className="text-[11px] text-zinc-500 dark:text-zinc-400 font-mono">
                         {isDone ? 'Standard Compliant' : 'Pending Verification'}

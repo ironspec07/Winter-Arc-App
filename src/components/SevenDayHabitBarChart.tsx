@@ -1,10 +1,11 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { AppState, HabitKey } from '../types';
 import {
   HABIT_DEFINITIONS,
   isHabitComplete,
   parseISODate,
   toISODate,
+  TOTAL_HABITS
 } from '../utils/arcEngine';
 import {
   ResponsiveContainer,
@@ -17,30 +18,19 @@ import {
   Cell,
   ReferenceLine,
 } from 'recharts';
-import { BarChart3, CheckCircle2, Flame } from 'lucide-react';
+import { BarChart3 } from 'lucide-react';
 
 interface SevenDayHabitBarChartProps {
   state: AppState;
   selectedDate: string;
 }
 
-const SIX_CORE_HABIT_KEYS: HabitKey[] = [
-  'steps',
-  'study',
-  'jobs',
-  'workout',
-  'discipline',
-  'water',
-];
-
 const SHORT_HABIT_NAMES: Record<HabitKey, string> = {
   steps: 'Steps',
-  study: 'Study',
-  jobs: 'Jobs',
-  workout: 'Training',
   discipline: 'Discipline',
-  water: 'Hydration',
-  hygiene: 'Brush 2×',
+  study: 'Study',
+  workout: 'Training',
+  jobs: 'Jobs',
 };
 
 interface HabitBarPoint {
@@ -56,8 +46,6 @@ export const SevenDayHabitBarChart: React.FC<SevenDayHabitBarChartProps> = ({
   state,
   selectedDate,
 }) => {
-  const [scope, setScope] = useState<'core6' | 'all7'>('core6');
-
   const { chartData, rangeLabel, overallRate, totalDone, totalPossible } = useMemo(() => {
     const anchor = parseISODate(selectedDate);
     const trailingDates: string[] = [];
@@ -78,12 +66,7 @@ export const SevenDayHabitBarChart: React.FC<SevenDayHabitBarChartProps> = ({
       day: 'numeric',
     })}`;
 
-    const activeDefs =
-      scope === 'core6'
-        ? HABIT_DEFINITIONS.filter((d) => SIX_CORE_HABIT_KEYS.includes(d.key))
-        : HABIT_DEFINITIONS;
-
-    const data: HabitBarPoint[] = activeDefs.map((def) => {
+    const data: HabitBarPoint[] = HABIT_DEFINITIONS.map((def) => {
       const completedDays = trailingDates.filter((iso) =>
         isHabitComplete(def.key, state.days[iso], iso)
       ).length;
@@ -111,7 +94,7 @@ export const SevenDayHabitBarChart: React.FC<SevenDayHabitBarChartProps> = ({
       totalDone,
       totalPossible,
     };
-  }, [state.days, selectedDate, scope]);
+  }, [state.days, selectedDate]);
 
   return (
     <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 p-4 sm:p-6 shadow-xs transition-all">
@@ -131,7 +114,7 @@ export const SevenDayHabitBarChart: React.FC<SevenDayHabitBarChartProps> = ({
 
           <h3 className="mt-1 text-base sm:text-lg font-bold font-mono text-zinc-900 dark:text-zinc-100 flex items-center gap-2 flex-wrap">
             <span>
-              {scope === 'core6' ? '6 Core Habits' : 'All 7 Habits'} (Last 7 Days)
+              5 Core Habits (Last 7 Days)
             </span>
             <span className="inline-flex items-center gap-1 text-xs font-mono font-semibold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60">
               {overallRate}% Avg ({totalDone}/{totalPossible})
@@ -139,30 +122,10 @@ export const SevenDayHabitBarChart: React.FC<SevenDayHabitBarChartProps> = ({
           </h3>
         </div>
 
-        {/* Scope Toggle */}
-        <div className="flex items-center gap-1 self-start sm:self-auto bg-zinc-100 dark:bg-zinc-800 p-1 rounded-xl border border-zinc-200/80 dark:border-zinc-700/80">
-          <button
-            type="button"
-            onClick={() => setScope('core6')}
-            className={`px-2.5 py-1 rounded-lg text-xs font-mono font-semibold transition-all cursor-pointer ${
-              scope === 'core6'
-                ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-xs'
-                : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200'
-            }`}
-          >
-            6 Core Habits
-          </button>
-          <button
-            type="button"
-            onClick={() => setScope('all7')}
-            className={`px-2.5 py-1 rounded-lg text-xs font-mono font-semibold transition-all cursor-pointer ${
-              scope === 'all7'
-                ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-xs'
-                : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200'
-            }`}
-          >
-            All 7 (+Brush)
-          </button>
+        <div className="flex items-center gap-2 text-xs font-mono text-zinc-500 dark:text-zinc-400">
+          <span className="px-2.5 py-1 rounded-lg bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 font-semibold">
+            {TOTAL_HABITS} Standards
+          </span>
         </div>
       </div>
 
@@ -193,7 +156,7 @@ export const SevenDayHabitBarChart: React.FC<SevenDayHabitBarChartProps> = ({
 
             <YAxis
               domain={[0, 100]}
-              ticks={[0, 25, 50, 75, 100]}
+              ticks={[0, 20, 40, 60, 80, 100]}
               tickLine={false}
               axisLine={{
                 stroke: 'currentColor',
@@ -255,7 +218,7 @@ export const SevenDayHabitBarChart: React.FC<SevenDayHabitBarChartProps> = ({
               }}
             />
 
-            <Bar dataKey="rate" radius={[8, 8, 0, 0]} maxBarSize={48}>
+            <Bar dataKey="rate" radius={[8, 8, 0, 0]} maxBarSize={56}>
               {chartData.map((entry) => {
                 let fillColor = '#71717a'; // zinc-500
                 if (entry.rate >= 80) {

@@ -6,13 +6,12 @@ import {
   isHabitComplete,
   getCompletedHabitCount,
   DISCIPLINE_THRESHOLD,
+  TOTAL_HABITS
 } from '../utils/arcEngine';
 import {
   Footprints,
   BrainCircuit,
-  Droplet,
   Briefcase,
-  Sparkles,
   ShieldCheck,
   Dumbbell,
   BarChart2,
@@ -31,12 +30,10 @@ interface PastSevenDaysSummaryCardProps {
 
 const HABIT_ICONS: Record<HabitKey, React.ReactNode> = {
   steps: <Footprints className="w-3.5 h-3.5 text-emerald-500" />,
-  study: <BrainCircuit className="w-3.5 h-3.5 text-indigo-500" />,
-  jobs: <Briefcase className="w-3.5 h-3.5 text-amber-500" />,
-  workout: <Dumbbell className="w-3.5 h-3.5 text-orange-500" />,
   discipline: <ShieldCheck className="w-3.5 h-3.5 text-rose-500" />,
-  water: <Droplet className="w-3.5 h-3.5 text-cyan-500" />,
-  hygiene: <Sparkles className="w-3.5 h-3.5 text-teal-500" />,
+  study: <BrainCircuit className="w-3.5 h-3.5 text-indigo-500" />,
+  workout: <Dumbbell className="w-3.5 h-3.5 text-orange-500" />,
+  jobs: <Briefcase className="w-3.5 h-3.5 text-amber-500" />,
 };
 
 export const PastSevenDaysSummaryCard: React.FC<PastSevenDaysSummaryCardProps> = ({
@@ -147,7 +144,7 @@ export const PastSevenDaysSummaryCard: React.FC<PastSevenDaysSummaryCardProps> =
                 Summary · Past 7 Days
               </h3>
               <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200/70 dark:border-zinc-700/70 font-semibold">
-                {selectedCategory === 'All' ? 'All 7 Habits' : `${selectedCategory} (${selectedHabits.length})`}
+                {selectedCategory === 'All' ? `All ${TOTAL_HABITS} Habits` : `${selectedCategory} (${selectedHabits.length})`}
               </span>
             </div>
             <p className="text-[11px] font-mono text-zinc-500 dark:text-zinc-400 mt-0.5">
