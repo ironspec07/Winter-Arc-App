@@ -26,8 +26,8 @@ export const MobileNav: React.FC<MobileNavProps> = ({
     },
     {
       id: 'workout',
-      label: 'Workout',
-      icon: <Dumbbell className="w-5 h-5 text-orange-500" />,
+      label: 'Training',
+      icon: <Dumbbell className="w-5 h-5" />,
     },
     {
       id: 'telemetry',
