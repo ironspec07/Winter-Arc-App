@@ -29,8 +29,8 @@ export const HABIT_DEFINITIONS: HabitDefinition[] = [
     unit: 'steps',
     step: 500,
     type: 'number',
-    homeTarget: 10000,
-    gymTarget: 10000,
+    homeTarget: 5000,
+    gymTarget: 5000,
     description: 'Baseline physical activity and metabolic expenditure.',
   },
   {
@@ -51,8 +51,8 @@ export const HABIT_DEFINITIONS: HabitDefinition[] = [
     unit: 'hours',
     step: 0.5,
     type: 'number',
-    homeTarget: 4,
-    gymTarget: 4,
+    homeTarget: 3,
+    gymTarget: 3,
     description: 'Zero-distraction deep work, skill development, or technical mastery.',
   },
   {
@@ -73,8 +73,8 @@ export const HABIT_DEFINITIONS: HabitDefinition[] = [
     unit: 'apps',
     step: 1,
     type: 'number',
-    homeTarget: 5,
-    gymTarget: 5,
+    homeTarget: 3,
+    gymTarget: 3,
     description: 'Proactive career outreach, submissions, or networking.',
   },
 ];
