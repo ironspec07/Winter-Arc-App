@@ -243,11 +243,11 @@ export function getDayTargets(iso: string): Record<HabitKey, number> {
   const isSunday = d.getDay() === 0;
 
   return {
-    steps: isSunday ? 0 : 10000,
+    steps: isSunday ? 0 : 5000,
     discipline: 1,
-    study: 4,
+    study: 3,
     workout: isSunday ? 0 : 1,
-    jobs: 5,
+    jobs: 4,
   };
 }
 
